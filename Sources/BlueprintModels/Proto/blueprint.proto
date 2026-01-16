@@ -1,0 +1,1175 @@
+syntax = "proto3";
+
+package com.gu.mobile.mapi.models.v0;
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+// A prefix only used for the Swift models
+option swift_prefix="Proto";
+
+/************************* COLLECTION *************************/
+
+// The following messages are used only to model the contents for our
+// fronts endpoints.
+
+message Collection {
+  string id = 1;
+  /**
+   * A palette at the collection level is currently mapped from MAPI's
+   * "navigation style". It's specified when the look and feel of an entire
+   * container should be changed, for example when a container is "branded"
+   * because the content has been paid for.
+   */
+  optional Palette palette_light = 2;
+  optional Palette palette_dark = 3;
+  /**
+   * MAPI can technically return a list of empty rows. This might be because
+   * MAPI doesn't support the specific content that's included in the
+   * collection. In this case it's assumed the client will hide the entire
+   * collection from the reader.
+   * Another reason for empty rows is that the collection is a titlepiece.
+   * In fact, we must keep the rows empty in this case in order not to break
+   * old versions of app that were built before titlepiece is introduced.
+   */
+  repeated Row rows = 4;
+  optional string title = 5;
+  /**
+   * We define branding at the collection level because certain containers
+   * require a different look and feel, for example content published by
+   * Guardian Labs.
+   */
+  optional Branding branding = 6;
+  /**
+   * A container can be defined as "premium". Currently this is just for the
+   * Crosswords container for which only premium users are allowed to access
+   * (although it is visible to all users). Note that the Crosswords
+   * container is not curated by Editorial in the fronts tool but instead
+   * created on the fly by MAPI.
+   */
+  optional bool premium_content = 7;
+  optional FollowUp follow_up = 8;
+
+  /**
+   * This tells the app whether or not to render a "show/hide" button at the
+   * top right of the container. For now, this is only used for thrashers,
+   *  which should not be hideable by the user.
+   */
+  bool hideable = 9;
+
+  optional MyGuardianFollow myguardian_follow = 10;
+
+  /**
+   * For some design on specific types of collections, we want to show
+   * an image and a description in the collection header.  This field is
+   * used for award text if the collection design is
+   * COLLECTION_DESIGN_TITLEPIECE.
+   */
+  optional string description = 11;
+  optional Image image = 12;
+
+  /**
+   * This tells the app which design to use to render the collection
+   */
+  enum CollectionDesign {
+    COLLECTION_DESIGN_UNSPECIFIED = 0;
+    COLLECTION_DESIGN_REGULAR = 1;
+    COLLECTION_DESIGN_PODCAST = 2;
+    COLLECTION_DESIGN_TITLEPIECE = 3;
+  }
+  optional CollectionDesign design = 13;
+
+  /**
+   * When this attribute is true, the vertical spacing is removed from
+   * the collection.
+   */
+  optional bool compact_padding = 14;
+
+  /**
+   * The property gives the ID of the collection to be used in
+   * the tracking data.
+   */
+  optional string tracking_id = 15;
+
+  /**
+   * The property is added when we build small story carousel where
+   * the header is rendered in smaller size to show they are child
+   * sections within a main collection.
+   */
+  optional bool small_heading = 16 [deprecated = true];
+
+  optional AdTargetingParams ad_targeting_params = 17;
+
+  optional string ad_unit = 18;
+
+  /**
+   * This tells the app in which style to display, or not display,
+   * the title.  It should not be used any more as a new equivalent
+   * enum class named "TitleStyle" is defined on the top level.
+   */
+  enum HeadingStyle {
+    HEADING_STYLE_UNSPECIFIED = 0;
+    HEADING_STYLE_HIDDEN = 1;
+    HEADING_STYLE_REGULAR = 2;
+    HEADING_STYLE_SMALL = 3;
+  }
+  /**
+   * This property is deprecated in favour of the property title_style.
+   * We still set this property to the same semantic value as
+   * the title style for backward compatibility.
+   */
+  optional HeadingStyle heading_style = 19;
+
+  /**
+   * The title of this collection for display.  It replaces
+   * the old "title" property.
+   */
+  optional string display_title = 20;
+
+  optional google.protobuf.Timestamp last_updated_date = 21;
+
+  /**
+   * Control in what style to display the collection title.
+   */
+  optional TitleStyle title_style = 22;
+
+  /**
+   * The default aspect ratio for trail images in this collection.
+   */
+  optional ImageAspectRatio preferred_image_aspect_ratio = 23;
+
+  optional bool tighten_vertical_spacing = 24;
+}
+
+/**
+ * The follow up message contains links to get more information about the
+ * collection.
+ */
+message FollowUp {
+  enum FollowUpType {
+    FOLLOW_UP_TYPE_UNSPECIFIED = 0;
+    FOLLOW_UP_TYPE_LIST = 1;
+    FOLLOW_UP_TYPE_FRONT = 2;
+    FOLLOW_UP_TYPE_INAPP = 3;
+  }
+  FollowUpType type = 1;
+  string uri = 2;
+  /**
+    * At the time of creation MAPI couldn't support blueprint versions of the
+    * follow-on link so this field was marked as optional. As part of the
+    * migration work, MAPI will eventually support blueprint endpoints for all
+    * follow on links.
+    */
+  optional string blueprint_uri = 3;
+}
+
+/**
+ * This is a special type of container on a front that is delivered via
+ * editorial tools.Thrashers are used to promote either features or
+ * commercial content.
+ */
+message Thrasher {
+  string uri = 1;
+}
+
+
+/************************* LIST *************************/
+
+// The following messages are used only to model the contents of our
+// list endpoints (tags, sections etc)
+
+/**
+  * A list is similar to a collection, except it is responsible for
+  * serving the contents of list pages such as tags and sections,
+  * rather than fronts
+  */
+message List {
+  string title = 1;
+  /**
+   * The native app will call this URL when a user has scrolled to the bottom
+   * of the list and wants to load more content.
+   */
+  optional string next_page_url = 2;
+  optional Palette palette_light = 3;
+  optional Palette palette_dark = 4;
+  repeated Row rows = 5;
+  optional Branding branding = 6;
+  repeated Topic topics = 7;
+  // use ad_unit instead
+  optional string ad_targeting_path = 8 [deprecated = true];
+  optional string previous_page_url = 9;
+  Tracking tracking = 10;
+  // Tells the app when rows to insert adverts before (not after!)
+  repeated int32 adverts = 11;
+  optional MyGuardianFollow my_guardian_follow = 12;
+  string id = 13;
+  /**
+   * This is only neded for tracking, but keeping out of the tracking
+   * message incase that changes
+   */
+  optional string web_uri = 14;
+  AdTargetingParams ad_targeting_params = 15;
+  /**
+   * Needed on lists and articles. Collections use the adUnit defined
+   * in the fronts response (e.g uk/fronts/home)
+   */
+  string ad_unit = 16;
+
+  optional google.protobuf.Timestamp last_updated_date = 17;
+
+  optional Header header = 18;
+
+  optional bool tighten_vertical_spacing = 19;
+}
+
+
+message Header {
+  string header_text = 1;
+  optional string description = 2;
+  HeaderType alignment = 3;
+  optional Palette palette_light = 4;
+  optional Palette palette_dark = 5;
+  optional Image image = 6;
+  optional Image profile_image = 7;
+  optional string description_html = 8;
+}
+
+enum HeaderType {
+  HEADER_TYPE_UNSPECIFIED = 0;
+  HEADER_TYPE_CENTRE = 1;
+  HEADER_TYPE_LEADING = 2;
+}
+/************************* MY GUARDIAN *************************/
+
+// The following messages are used only to model the contents of our
+// My Guardian endpoints (grid, feed etc)
+
+/**
+  * This message type is similar to Collection but with less information.
+  * It will be used when the client will decide how to lay out
+  * the collection instead of the server. This is useful for My Guardian
+  * where the client will need to deduplicate the content from multiple
+  * collections.
+  */
+message LayoutAgnosticCollection {
+  string id = 1;
+  /**
+    * A palette at the collection level is currently mapped from MAPI's
+    * "navigation style". It's specified when the look and feel of an entire
+    * container should be changed, for example when a container is "branded"
+    * because the content has been paid for.
+    */
+  optional Palette palette_light = 2;
+  optional Palette palette_dark = 3;
+  /**
+    * Here we return a list of cards instead of rows. This means that
+    * the client will need to decide how to layout the cards.
+    */
+  repeated Card cards = 4;
+  optional string title = 5;
+  optional FollowUp follow_up = 6;
+
+  /**
+   * The property gives the ID of the collection to be used in
+   * the tracking data.
+   */
+  optional string tracking_id = 7;
+
+  optional Image image = 8;
+}
+
+/************************* SHARED *************************/
+
+
+// The following messages shared between both the higher level
+// collection and list messages.
+
+message Palette {
+  string accent_colour = 1;
+  string background = 2;
+  string comment_count = 3;
+  string element_background = 4;
+  string headline = 5;
+  string immersive_kicker = 6;
+  string main = 7;
+  string media_background = 8;
+  string media_icon = 9;
+  string meta_text = 10;
+  string pill = 11;
+  string pillar = 12;
+  string secondary = 13;
+  string shadow = 14;
+  string top_border = 15;
+  /*
+   * Used for kicker text colour post Fairground updates. For Live cards,
+   * `pill` colour provides the background and `kicker_text` is the text
+   * colour.
+   */
+  string kicker_text = 16;
+
+  /*
+  * The background colour of the pill on media cards.
+  */
+  string media_pill_background = 17;
+
+  /*
+  * The foreground colour of the pill on media cards.
+  */
+  string media_pill_foreground = 18;
+}
+
+message Links {
+  optional string related_uri = 1;
+  optional string short_url = 2;
+  string uri = 3;
+  optional string web_uri = 4;
+}
+
+enum MediaType {
+  MEDIA_TYPE_UNSPECIFIED = 0;
+  MEDIA_TYPE_VIDEO = 1;
+  MEDIA_TYPE_AUDIO = 2;
+  MEDIA_TYPE_IMAGE = 3;
+}
+
+message MediaPill {
+  string name = 1;
+  string icon = 2;
+  /*
+    The detail varies depending on the type of pill:
+    for a video or podcast, it's the duration,
+    for a gallery it's the number of images,
+    for a newsletter it's the frequency
+  */
+  string detail = 3;
+}
+
+message Image {
+  optional string alt_text = 1;
+  optional string caption = 2;
+  optional string credit = 3;
+  optional int32 height = 4;
+  string url_template = 6;
+  optional int32 width = 7;
+}
+
+enum Platform {
+  PLATFORM_UNSPECIFIED = 0;
+  PLATFORM_YOUTUBE = 1;
+  PLATFORM_URL = 2;
+}
+
+enum VideoOverlayPosition {
+  VIDEO_OVERLAY_POSITION_UNSPECIFIED = 0;
+  VIDEO_OVERLAY_POSITION_BOTTOM = 1;
+  VIDEO_OVERLAY_POSITION_TOP = 2;
+}
+
+message Video {
+  optional string alt_text = 1;
+  optional string caption = 2;
+  optional string credit = 3;
+  optional int32 height = 4;
+  optional string orientation = 5;
+  string url = 6;
+  optional int32 width = 7;
+  optional string youtube_id = 8 [deprecated = true];
+  optional int32 duration_in_seconds = 9;
+  optional Image poster_image = 10;
+  bool is_live_video = 11;
+  optional string video_id = 12;
+  optional Platform platform = 13;
+  bool is_looping = 14;
+  bool is_autoplay = 15;
+  bool is_interactive = 16;
+  bool show_progress_bar = 17;
+  bool show_subtitles = 18;
+  VideoOverlayPosition overlay_position = 19;
+}
+
+message Audio {
+  string id = 1;
+  optional string source = 2;
+  optional int32 duration_in_seconds = 3;
+  string uri = 4;
+  string ad_free_uri = 5;
+  optional string mime_type = 6;
+  /*
+    The following fields are used to give article
+    information about the audio file that is being played
+    This is used for the `latestEpisode` feature on
+    the podcast series cards
+   */
+  optional string article_id = 7;
+  optional Links links = 8;
+  optional string title = 9;
+  optional string byline = 10;
+}
+
+message PodcastSeries {
+  string id = 1;
+  string title = 2;
+  string url = 3;
+  optional FollowUp follow_up = 4;
+  optional Image image = 5;
+  optional string description = 6;
+  optional Audio latest_episode = 7;
+}
+
+// This message is only applicable to live blogs.
+message LiveEvent {
+  string id = 1;
+  string title = 2;
+  string body = 3;
+  optional google.protobuf.Timestamp published_date = 4;
+  optional google.protobuf.Timestamp last_updated_date = 5;
+}
+
+message Branding {
+  string branding_type = 1;
+  optional string sponsor_name = 2;
+  optional string logo = 3;
+  optional string sponsor_uri = 4;
+  optional string label = 5;
+  optional string about_uri = 6;
+  optional string alt_logo = 7;
+}
+
+/**
+  * Control in what style to display a title.
+  */
+enum TitleStyle {
+  TITLE_STYLE_UNSPECIFIED = 0;
+  TITLE_STYLE_HIDDEN = 1;
+  TITLE_STYLE_REGULAR = 2;
+  TITLE_STYLE_SMALL = 3;
+}
+
+/**
+ * The rendering platform support object is required to support opening AR
+ * articles on native clients.We don't return this message if the corresponding
+ * article cannot be rendered by the server (instead only by legacy article
+ * templates).
+ */
+message RenderingPlatformSupport {
+  string min_bridget_version = 1;
+  string uri = 2;
+}
+
+/**
+ * The message provides the link to fetch the audio for listen-to-article
+ * feature on the article and other information for UI display.
+ */
+message ListenToArticle {
+  string audio_uri = 1;
+  int32 duration_in_seconds = 2;
+}
+
+message Article {
+  string id = 1;
+  optional string byline = 2;
+  repeated Image images = 3;
+  optional Links links = 4;
+  optional string kicker = 5;
+  optional string title = 6;
+  optional string trail_text = 7;
+  optional int32 rating = 8;
+  optional int32 comment_count = 9;
+  optional google.protobuf.Timestamp published_date = 10;
+  optional google.protobuf.Timestamp last_updated_date = 11;
+  optional MediaType media_type = 12;
+  // Only expected for video or audio content.
+  optional google.protobuf.Duration duration = 13;
+  // MAPI will never return both images and a profile_image.
+  optional Image profile_image = 14;
+  repeated LiveEvent events = 15;
+  optional Palette palette_light = 16;
+  optional Palette palette_dark = 17;
+  // Only applicable to podcasts.
+  optional string apple_podcast_url = 18;
+  // Only applicable to podcasts.
+  optional string google_podcast_url = 19;
+  // Only applicable to podcasts.
+  optional string spotify_podcast_url = 20;
+  repeated Video videos = 21;
+  /**
+   * This is an indicator as to whether a live blog is still blogging, or if
+   * it's been closed.
+   */
+  optional bool is_live = 22;
+  // Only applicable to podcasts.
+  optional string pocket_cast_podcast_url = 23;
+  optional RenderingPlatformSupport rendered_item_prod = 24;
+  optional RenderingPlatformSupport rendered_item_beta = 25;
+  // Quoted headline shown for a card if selected in the fronts tool.
+  optional bool show_quoted_headline = 26;
+  // Only applicable to cards that display web content (e.g. snap links)
+  optional string web_content_uri = 27;
+  Tracking tracking = 28;
+  // Only applicable to podcast card
+  optional Audio audio = 29;
+  // Only applicable to podcast card
+  optional PodcastSeries podcast_series = 30;
+  AdTargetingParams ad_targeting_params = 31;
+  /**
+   * Needed on lists and articles whereas collections use the adUnit
+   * defined in the fronts response (e.g uk/fronts/home)
+   */
+  optional string ad_unit = 32;
+  // field we get from CAPI set by the editorial team
+  bool should_hide_reader_revenue = 33;
+  // field we get from CAPI set by the editorial team
+  bool should_hide_adverts = 34;
+  // some design types (immersive/interactive) should hide the nav/tab bar
+  bool should_hide_nav = 35;
+  /**
+   * It is available when the listen-to-article is supported on this article
+   */
+  optional ListenToArticle listen_to_article = 36;
+
+  /**
+   * Number of images in a gallery card. This is used to display gallery
+   * metadata on card when the media_type is MEDIA_TYPE_IMAGE.
+   */
+  optional int32 gallery_image_count = 37;
+
+  repeated BasicTag basic_tags = 38;
+
+  // Only applicable to navigational card
+  optional FollowUp follow_up = 39;
+
+  // The pill details that media cards should display.
+  optional MediaPill media_pill = 40;
+}
+
+message Card {
+  enum CardType {
+    CARD_TYPE_UNSPECIFIED = 0;
+    CARD_TYPE_ARTICLE = 1;
+    CARD_TYPE_PODCAST = 2;
+    CARD_TYPE_VIDEO = 3;
+    CARD_TYPE_CROSSWORD = 4;
+    /**
+     * Display cards have their own separate design (see figma designs for
+     * ref).
+     */
+    CARD_TYPE_DISPLAY = 5;
+    CARD_TYPE_NUMBERED = 6;
+    /**
+    * An empty card is used to indicate an empty space so that the native
+    * client do not stretch the previous card to occupy the space
+    */
+    CARD_TYPE_EMPTY = 7;
+    /**
+     * Used when a card should display content using a web view. Initially
+     * this has been implemented for "snap links", which are atoms for a
+     * front placed inside a regular container alongside other cards.
+     */
+    CARD_TYPE_WEB_CONTENT = 8;
+    /**
+     * A card showing a podcast series.  Internally it is represented as
+     * a snaplink with the type "link" and a link url pointing at a podcast
+     * series tag.
+     */
+    CARD_TYPE_PODCAST_SERIES = 9;
+    /**
+     * A card with a different design.  It is intended for highlights
+     * containers.
+     * This value will be deprecated soon.  We should set the card size
+     * to CARD_SIZE_HIGHLIGHTS instead.
+     */
+    CARD_TYPE_HIGHLIGHT = 10;
+
+    CARD_TYPE_NAVIGATION = 11;
+    /**
+     * A card for a gallery item.
+     */
+    CARD_TYPE_GALLERY = 12;
+  }
+  CardType type = 1;
+  /**
+    The article that this card is representing. It is optional
+    because not all cards will have an article associated with
+    them i.e Crosswords or Web content.
+  */
+  optional Article article = 2;
+  /**
+   * Boosted cards show a boosted headline size.
+   * It will be deprecated after we have switched to card size and
+   * boost level to indicate the headline size.
+   */
+  optional bool boosted = 3;
+  /**
+   * Compact cards don't show all the information that non-compact cards do,
+   * and tend to appear in a carousel.
+   * It will be deprecated after we have switched to card size and
+   * boost level to indicate the card size.
+   */
+  optional bool compact = 4;
+  repeated Article sublinks = 5;
+  optional string html_fallback = 6;
+  /**
+   * Individual cards can be branded and not be part of a branded container.
+   * Cards that are branded tend to show the sponsor logo and should be
+   * returned with a different palette.
+   */
+  optional Branding branding = 7;
+  /**
+   * Individual cards can be defined as "premium content". If premium_content
+   * is true then it implies the card should be hidden from signed-in users,
+   * for example if the card has been paid for by an external sponsor.
+   */
+  optional bool premium_content = 8;
+  optional Palette sublinks_palette_light = 9;
+  optional Palette sublinks_palette_dark = 10;
+  /**
+   * This is the number to be used when the card type is CARD_TYPE_NUMBERED.
+   */
+  optional int32 card_number = 11;
+  /**
+   * This optional field is set if this card type is CARD_TYPE_PODCAST_SERIES.
+   * It provides the details on the podcast series.
+   */
+  optional PodcastSeries podcast_series = 12;
+  /**
+   * The correspondingTags is to denote which of the tags that a user has
+   * selected are applied to a particular content item
+   */
+  repeated MyGuardianFollow corresponding_tags = 37;
+  /**
+   * Mega-boosted cards show a even larger headline size.
+   * It is deprecated as we switch to card size and boost level to
+   * indicate the headline size.
+   */
+  optional bool mega_boosted = 38 [deprecated = true];
+
+  /**
+   * Indicate how many columns the trail image is expected to take.
+   * It is deprecated as we switch to card size and boost level to
+   * indicate in what size to display the trail image.
+   */
+  optional int32 trail_image_size = 39 [deprecated = true];
+
+  /**
+   * Deprecated field.  It was the aspect ratio for trail image but
+   * it was no longer needed because the card size can imply the image
+   * aspect ratio needed.  When a card size can support a new image
+   * aspect ratio and the old 5:3 crop, the native can check
+   * the preferred_image_aspect_ratio property in the collection.
+   */
+  reserved 40;
+  reserved "trail_image_aspect_ratio";
+
+  /**
+   * Define constants for the arrangement of sublinks on a card
+   */
+  enum SublinksArrangement {
+    SUBLINKS_ARRANGEMENT_UNSPECIFIED = 0;
+    SUBLINKS_ARRANGEMENT_VERTICAL = 1;
+    SUBLINKS_ARRANGEMENT_HORIZONTAL = 2;
+  }
+
+  /**
+   * Indicate how sublinks are arranged.
+   * It is deprecated as it is replaced by a new field named
+   * preferred_sublinks_arrangement.
+   */
+  optional SublinksArrangement sublinks_arrangement = 41 [deprecated = true];
+
+  /**
+   * Define different levels for headline size
+   */
+  enum BoostedHeadline {
+    BOOSTED_HEADLINE_UNSPECIFIED = 0;
+    BOOSTED_HEADLINE_STANDARD = 1;
+    BOOSTED_HEADLINE_BOOSTED_1 = 2;
+    BOOSTED_HEADLINE_BOOSTED_2 = 3;
+    BOOSTED_HEADLINE_BOOSTED_3 = 4;
+    BOOSTED_HEADLINE_BOOSTED_4 = 5;
+  }
+
+  /**
+   * Indicate the size of a headline.
+   * It is deprecated as we switch to card size and boost level to
+   * indicate the headline size.
+   */
+  optional BoostedHeadline boosted_headline = 42 [deprecated = true];
+
+  /**
+   * Define constants for positions to display the headline in a card.
+   */
+  enum HeadlinePosition {
+    HEADLINE_POSITION_UNSPECIFIED = 0;
+    HEADLINE_POSITION_INLINE = 1;
+    HEADLINE_POSITION_TOP = 2;
+  }
+
+  /**
+   * Indictate where to display the headline.
+   * It is deprecated as the headline position is implied by
+   * the card size.
+   */
+  optional HeadlinePosition headline_position = 43 [deprecated = true];
+
+  /**
+   * Define card sizes
+   */
+  enum CardSize {
+    CARD_SIZE_UNSPECIFIED = 0;
+    CARD_SIZE_X_SMALL = 1;
+    CARD_SIZE_SMALL = 2;
+    CARD_SIZE_MEDIUM_HORIZONTAL = 3;
+    CARD_SIZE_MEDIUM_VERTICAL = 4;
+    CARD_SIZE_LARGE = 5;
+    CARD_SIZE_LARGE_HORIZONTAL = 6;
+    CARD_SIZE_X_LARGE = 7;
+    CARD_SIZE_HIGHLIGHTS = 8;
+    CARD_SIZE_X_LARGE_HORIZONTAL = 9;
+  }
+
+  optional CardSize card_size = 44;
+
+  optional int32 boost_level = 45;
+
+  /**
+   * Indicate how sublinks are arranged.
+   */
+  optional SublinksArrangement preferred_sublinks_arrangement = 46;
+
+  /**
+   * Control how the top border is displayed.
+   */
+  optional TopBorderStyle top_border_style = 47;
+
+  /**
+   * Control what font weight to use for the headline.
+   */
+  optional FontWeight headline_weight = 48;
+
+  optional NavCardType nav_card_type = 49;
+
+  optional bool should_hide_image = 50;
+
+  /**
+   * Provide a separate palette for Android's condensed view.
+   */
+  optional Palette condensed_palette_light = 51;
+  optional Palette condensed_palette_dark = 52;
+
+}
+
+enum NavCardType {
+  NAV_CARD_TYPE_UNSPECIFIED = 0;
+  NAV_CARD_TYPE_NEWS = 1;
+  NAV_CARD_TYPE_SPORT = 2;
+  NAV_CARD_TYPE_LIFESTYLE = 3;
+  NAV_CARD_TYPE_NARRATIVE = 4;
+}
+
+enum TopBorderStyle {
+  TOP_BORDER_STYLE_UNSPECIFIED = 0;
+  TOP_BORDER_STYLE_HIDDEN = 1;
+  TOP_BORDER_STYLE_REGULAR = 2;
+}
+
+/**
+  * Define constants for each image aspect ratio supported
+  */
+enum ImageAspectRatio {
+  IMAGE_ASPECT_RATIO_UNSPECIFIED = 0;
+  IMAGE_ASPECT_RATIO_LANDSCAPE_5_3 = 1;
+  IMAGE_ASPECT_RATIO_LANDSCAPE_5_4 = 2;
+  IMAGE_ASPECT_RATIO_PORTRAIT_4_5 = 3;
+  IMAGE_ASPECT_RATIO_SQUARE = 4;
+}
+
+/**
+  * Define different levels for font weight
+  */
+enum FontWeight {
+  FONT_WEIGHT_UNSPECIFIED = 0;
+  FONT_WEIGHT_STANDARD = 1;
+  FONT_WEIGHT_LIGHT = 2;
+}
+
+message Column {
+  /**
+   * By default, if there are multiple cards in the cards array then it's
+   * expected the client will display these as stacked vertical elements.
+   */
+  repeated Card cards = 1;
+  optional Palette palette_light = 2;
+  optional Palette palette_dark = 3;
+  // The card(s) in the column assume this preferred width.
+  int32 preferred_width = 4;
+
+  /**
+   * Decide whether to show horizontal dividers between cards which
+   * are stacked in this column.
+   */
+  optional bool show_horizontal_dividers = 5;
+}
+
+message Row {
+  enum RowType {
+    ROW_TYPE_UNSPECIFIED = 0;
+    // Layout is the "default" way of laying out rows and columns.
+    ROW_TYPE_LAYOUT = 1;
+    ROW_TYPE_CAROUSEL = 2;
+    /**
+     * Used when the entire row only contains web content, for example
+     * when thrashers are displayed inside a fixed/thrasher container.
+     */
+    ROW_TYPE_WEB_CONTENT = 3;
+    /**
+     * New carousel style on some new collection types such as
+     * small story carousel on tablet
+     */
+    ROW_TYPE_PROGRAMMATIC_CAROUSEL = 4;
+  }
+  repeated Column columns = 1;
+
+  /**
+   * Deprecate the palette_light property in a Row as we did
+   * not and will not use this property.
+   */
+  reserved "palette_light";
+  reserved 2;
+
+  /**
+   * Deprecate the palette_dark property in a Row as we did
+   * not and will not use this property.
+   */
+  reserved "palette_dark";
+  reserved 3;
+
+  /**
+   * Tablet devices support a 4 column display, whereas mobile devices
+   * support a 2 column display. If a mobile device receives a row with a
+   * preferred number of columns greater than 2, the additional columns are
+   * "wrapped" onto an extra row (a bit like CSS flex-wrap).
+   */
+  int32 preferred_number_of_columns = 4;
+  optional Thrasher thrasher = 5;
+  RowType type = 6;
+  optional string title = 7;
+
+  /**
+   * When this attribute is true, the spacing in between cards in the row is
+   * reduced.
+   */
+  optional bool tighten_spacing = 8;
+
+  /**
+   * Clicking the row title takes users to the page indicated by
+   * this attribute.  The row title is not clickable if it is empty.
+   */
+  optional FollowUp follow_up = 9;
+
+  /** Deprecated.  It was the old heading style. */
+  reserved "heading_style";
+  reserved 10;
+
+  /**
+   * The property gives the ID for tracking data which is sent by
+   * the apps when users tap the row title.
+   */
+  optional string tracking_id = 11;
+
+  /**
+   * Control in what style to display the row title.
+   */
+  optional TitleStyle title_style = 12;
+
+  /**
+   * Decide whether to show vertical dividers in between cards on
+   * this row
+   */
+  optional bool show_vertical_dividers = 13;
+
+  /**
+   * Decide whether to show horizontal dividers at the top of this row
+   */
+  optional bool show_horizontal_dividers = 14;
+}
+
+message Topic {
+  string type = 1;
+  // let's change this to "id" in the future, name is a bit misleading
+  string name = 2;
+  string display_name = 3;
+}
+
+message MyGuardianFollow {
+  enum FollowType {
+    FOLLOW_TYPE_UNSPECIFIED = 0;
+    FOLLOW_TYPE_CONTRIBUTOR = 1;
+    FOLLOW_TYPE_KEYWORD = 2;
+    FOLLOW_TYPE_SERIES = 3;
+    FOLLOW_TYPE_SECTION = 4;
+    FOLLOW_TYPE_NEWSPAPER_BOOK_SECTION = 5;
+    FOLLOW_TYPE_NEWSPAPER_BOOK = 6;
+    FOLLOW_TYPE_BLOG = 7;
+    FOLLOW_TYPE_TONE = 8;
+    FOLLOW_TYPE_PUBLICATION = 9;
+    FOLLOW_TYPE_TRACKING = 10;
+    FOLLOW_TYPE_PAID_CONTENT = 11;
+    FOLLOW_TYPE_CAMPAIGN = 12;
+    FOLLOW_TYPE_TYPE = 13;
+  }
+  string id = 1;
+  string web_title = 2;
+  FollowType type = 3;
+}
+
+
+/** Used for advert targeting. We should perhaps consider moving
+ this into its own Commercial message along with adTargetingPath
+  in the future */
+message AdTargetingParams {
+  map<string, string> ad_targeting = 4;
+}
+
+/** Tracking messages */
+
+message Tracking {
+  Permutive permutive = 1;
+  /** For some lists and articles we return nielsen tracking data
+   depending on the section they belong to */
+  optional string nielsen_section = 2;
+  repeated BasicTag commissioning_desks = 3;
+}
+
+message Permutive {
+  string id = 1;
+  string type = 2;
+  optional string title = 3;
+  optional string section = 4;
+  repeated string authors = 5;
+  repeated string keywords = 6;
+  optional google.protobuf.Timestamp published_at = 7;
+  optional string series = 8;
+}
+
+/** For some articles we return commissioning desk tracking (aka BasicTag)
+data based on if the article has a "tracking" tag which is set in CAPI.
+Commissioning desk data will never be included at the upper list level.
+*/
+message BasicTag {
+  string id = 1;
+  string web_title = 2;
+}
+
+/************************* FOOTBALL *************************/
+
+
+// The following messages are used to model the contents for our
+// blueprint football endpoints. Currently a WIP and not in prod/beta.
+
+/**
+ * A football team
+ */
+message Team {
+  /**
+   * Each team will have a unique numerical ID
+   */
+  string id = 1;
+
+  /**
+   * The name of the team, i.e "Luton Town"
+   */
+  string name = 2;
+
+  /**
+   * The short code name for the team, i.e "LUT"
+   */
+  string short_code = 3;
+
+  /**
+   * The team's crest or flag for countries
+   */
+  Image crest = 4;
+}
+
+/**
+ * Some leagues can have multiple tables, i.e group stage tables
+ */
+message TableGroups {
+
+  /**
+   * The name of the competition, i.e "UEFA Nations League"
+   */
+  string competition_name = 1;
+
+  /**
+   * The table (or tables) for that league.
+   */
+  repeated Table tables = 2;
+}
+
+/**
+ * A football table for either a competition or league.
+ * One competition/league may be composed of many tables
+ * in the case of those with groups. E.g., world cups
+ * have group stages.
+ */
+message Table {
+  /**
+   * The group name, for example "Group A". Only useful
+    * for competitions with groups.
+   */
+  optional string group_name = 1;
+
+  /**
+   * Each team and their position in the table
+   */
+  repeated TablePosition teams = 2;
+}
+
+/**
+ * A team, their position within a league and other stats,
+ * i.e Luton Town at 2nd place with n goal difference etc.
+ */
+message TablePosition {
+
+  /**
+   * A football team
+   */
+  Team team = 1;
+
+  /**
+   * The team's position in the table, i.e 2 for 2nd place
+   */
+  int32 position = 2;
+
+  /**
+   * The number of games played
+   */
+  int32 played = 3;
+
+  /**
+   * The number of games won
+   */
+  int32 won = 4;
+
+  /**
+   * The number of games drawn
+   */
+  int32 drawn = 5;
+
+  /**
+   * The number of games lost
+   */
+  int32 lost = 6;
+
+  /**
+   * The number of goals scored
+   */
+  int32 goals_for = 7;
+
+  /**
+   * The number of goals conceded
+   */
+  int32 goals_against = 8;
+
+  /**
+   * The goal difference
+   */
+  int32 goal_difference = 9;
+
+  /**
+   * The number of points
+   */
+  int32 points = 10;
+
+  // protolint:disable:next REPEATED_FIELD_NAMES_PLURALIZED
+  /**
+   * The recent form of the team
+   *
+   */
+  repeated Form recent_form = 11;
+
+  /**
+   * Whether to show a divider after this team in the table
+   * to illustrate the relegation/promotion line
+   */
+  bool show_divider = 12;
+
+  /**
+   * Tells you if a previous game was won, drawn or lost
+   */
+  enum Form {
+    FORM_UNSPECIFIED = 0;
+    FORM_WIN = 1;
+    FORM_DRAW = 2;
+    FORM_LOSS = 3;
+  }
+
+  /**
+   * The in-app follow-up if the team is clicked.
+   * This will be used to navigate to the tag page for that team
+   */
+  optional FollowUp follow_up = 13;
+}
+
+/**
+ * Each results/fixtures response will contain a list of match
+ * days for the chosen league. Fixtures will be returned in
+  * chronological order and matches in reverse chronological order.
+ */
+message CompetitionWithMatchDays {
+
+  /**
+   * The match days for the league
+   */
+  repeated MatchDay match_days = 1;
+
+  /**
+   * The name of the competition, i.e "Premier League"
+   */
+  string competition_name = 2;
+}
+
+message MatchDay {
+
+  /**
+   * The date of the match day. Will be the start of the day.
+   */
+  google.protobuf.Timestamp date = 1;
+
+  /**
+   * i.e "Premier League" or if live "Premier League live"
+   */
+  string match_day_name = 3;
+
+  /**
+   * The matches for the competition on the date
+   */
+  repeated Match matches = 2;
+}
+
+message Match {
+
+  string id = 1;
+  Team home_team = 2;
+  Team away_team = 3;
+  google.protobuf.Timestamp kick_off = 4;
+
+  /**
+   * The score of the match, i.e "2-1". Optional as the match may not
+   * have started yet.
+   */
+  optional string score = 5;
+
+  /**
+   * Could be the status of the match, i.e "FT" for full time
+   or an aggregate score, i.e "2-1" for a two legged match.
+   */
+  optional string match_detail = 6;
+
+  /**
+   * The URL to retrieve the match report (if it exists),
+   * stats and topic for notification.
+   */
+  optional string match_info_uri = 7;
+}

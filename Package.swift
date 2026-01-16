@@ -1,23 +1,30 @@
-// swift-tools-version: 6.2
+// swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
+// swiftlint:disable:next prefixed_toplevel_constant
 let package = Package(
     name: "BlueprintModels",
+    platforms: [
+        .iOS(.v18)
+    ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "BlueprintModels",
             targets: ["BlueprintModels"]
-        ),
+        )
+    ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.30.0")
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "BlueprintModels"
-        ),
-
-    ]
+            name: "BlueprintModels",
+            dependencies: [
+                .product(name: "SwiftProtobuf", package: "swift-protobuf")
+            ]
+        )
+    ],
+    swiftLanguageModes: [.v5]
 )
