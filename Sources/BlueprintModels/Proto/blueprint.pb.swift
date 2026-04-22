@@ -1570,6 +1570,43 @@ struct ProtoVideo: @unchecked Sendable {
     set {_uniqueStorage()._overlayPosition = newValue}
   }
 
+  ///
+  /// Allow users to unmute the video
+  var supportAudio: Bool {
+    get {return _storage._supportAudio}
+    set {_uniqueStorage()._supportAudio = newValue}
+  }
+
+  ///
+  /// Allow users to navigate the video for example
+  /// through a scrub bar
+  var allowSeeking: Bool {
+    get {return _storage._allowSeeking}
+    set {_uniqueStorage()._allowSeeking = newValue}
+  }
+
+  ///
+  /// Allow users to expand the video full screen
+  var allowFullscreen: Bool {
+    get {return _storage._allowFullscreen}
+    set {_uniqueStorage()._allowFullscreen = newValue}
+  }
+
+  ///
+  /// Display timestamp on the player
+  var showTimestamp: Bool {
+    get {return _storage._showTimestamp}
+    set {_uniqueStorage()._showTimestamp = newValue}
+  }
+
+  ///
+  /// Allow users to share the video via the platform's
+  /// sharing capability
+  var allowSharing: Bool {
+    get {return _storage._allowSharing}
+    set {_uniqueStorage()._allowSharing = newValue}
+  }
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -4786,7 +4823,7 @@ extension ProtoImage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
 
 extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Video"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}alt_text\0\u{1}caption\0\u{1}credit\0\u{1}height\0\u{1}orientation\0\u{1}url\0\u{1}width\0\u{3}youtube_id\0\u{3}duration_in_seconds\0\u{3}poster_image\0\u{3}is_live_video\0\u{3}video_id\0\u{1}platform\0\u{3}is_looping\0\u{3}is_autoplay\0\u{3}is_interactive\0\u{3}show_progress_bar\0\u{3}show_subtitles\0\u{3}overlay_position\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}alt_text\0\u{1}caption\0\u{1}credit\0\u{1}height\0\u{1}orientation\0\u{1}url\0\u{1}width\0\u{3}youtube_id\0\u{3}duration_in_seconds\0\u{3}poster_image\0\u{3}is_live_video\0\u{3}video_id\0\u{1}platform\0\u{3}is_looping\0\u{3}is_autoplay\0\u{3}is_interactive\0\u{3}show_progress_bar\0\u{3}show_subtitles\0\u{3}overlay_position\0\u{3}support_audio\0\u{3}allow_seeking\0\u{3}allow_fullscreen\0\u{3}show_timestamp\0\u{3}allow_sharing\0")
 
   fileprivate class _StorageClass {
     var _altText: String? = nil
@@ -4808,6 +4845,11 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
     var _showProgressBar: Bool = false
     var _showSubtitles: Bool = false
     var _overlayPosition: ProtoVideoOverlayPosition = .unspecified
+    var _supportAudio: Bool = false
+    var _allowSeeking: Bool = false
+    var _allowFullscreen: Bool = false
+    var _showTimestamp: Bool = false
+    var _allowSharing: Bool = false
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -4837,6 +4879,11 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
       _showProgressBar = source._showProgressBar
       _showSubtitles = source._showSubtitles
       _overlayPosition = source._overlayPosition
+      _supportAudio = source._supportAudio
+      _allowSeeking = source._allowSeeking
+      _allowFullscreen = source._allowFullscreen
+      _showTimestamp = source._showTimestamp
+      _allowSharing = source._allowSharing
     }
   }
 
@@ -4874,6 +4921,11 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
         case 17: try { try decoder.decodeSingularBoolField(value: &_storage._showProgressBar) }()
         case 18: try { try decoder.decodeSingularBoolField(value: &_storage._showSubtitles) }()
         case 19: try { try decoder.decodeSingularEnumField(value: &_storage._overlayPosition) }()
+        case 20: try { try decoder.decodeSingularBoolField(value: &_storage._supportAudio) }()
+        case 21: try { try decoder.decodeSingularBoolField(value: &_storage._allowSeeking) }()
+        case 22: try { try decoder.decodeSingularBoolField(value: &_storage._allowFullscreen) }()
+        case 23: try { try decoder.decodeSingularBoolField(value: &_storage._showTimestamp) }()
+        case 24: try { try decoder.decodeSingularBoolField(value: &_storage._allowSharing) }()
         default: break
         }
       }
@@ -4943,6 +4995,21 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
       if _storage._overlayPosition != .unspecified {
         try visitor.visitSingularEnumField(value: _storage._overlayPosition, fieldNumber: 19)
       }
+      if _storage._supportAudio != false {
+        try visitor.visitSingularBoolField(value: _storage._supportAudio, fieldNumber: 20)
+      }
+      if _storage._allowSeeking != false {
+        try visitor.visitSingularBoolField(value: _storage._allowSeeking, fieldNumber: 21)
+      }
+      if _storage._allowFullscreen != false {
+        try visitor.visitSingularBoolField(value: _storage._allowFullscreen, fieldNumber: 22)
+      }
+      if _storage._showTimestamp != false {
+        try visitor.visitSingularBoolField(value: _storage._showTimestamp, fieldNumber: 23)
+      }
+      if _storage._allowSharing != false {
+        try visitor.visitSingularBoolField(value: _storage._allowSharing, fieldNumber: 24)
+      }
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -4971,6 +5038,11 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
         if _storage._showProgressBar != rhs_storage._showProgressBar {return false}
         if _storage._showSubtitles != rhs_storage._showSubtitles {return false}
         if _storage._overlayPosition != rhs_storage._overlayPosition {return false}
+        if _storage._supportAudio != rhs_storage._supportAudio {return false}
+        if _storage._allowSeeking != rhs_storage._allowSeeking {return false}
+        if _storage._allowFullscreen != rhs_storage._allowFullscreen {return false}
+        if _storage._showTimestamp != rhs_storage._showTimestamp {return false}
+        if _storage._allowSharing != rhs_storage._allowSharing {return false}
         return true
       }
       if !storagesAreEqual {return false}
