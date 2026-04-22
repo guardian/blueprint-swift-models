@@ -2687,6 +2687,11 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
     public let showProgressBar: Bool
     public let showSubtitles: Bool
     public let overlayPosition: BlueprintVideoOverlayPosition
+    public let supportAudio: Bool
+    public let allowSeeking: Bool
+    public let allowFullscreen: Bool
+    public let showTimestamp: Bool
+    public let allowSharing: Bool
     public private(set) var _backingData: Data?
 
     public init(
@@ -2708,7 +2713,12 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
          isInteractive: Bool,
          showProgressBar: Bool,
          showSubtitles: Bool,
-         overlayPosition: BlueprintVideoOverlayPosition
+         overlayPosition: BlueprintVideoOverlayPosition,
+         supportAudio: Bool,
+         allowSeeking: Bool,
+         allowFullscreen: Bool,
+         showTimestamp: Bool,
+         allowSharing: Bool
     ) {
         self.altText = altText
         self.caption = caption
@@ -2729,6 +2739,11 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
         self.showProgressBar = showProgressBar
         self.showSubtitles = showSubtitles
         self.overlayPosition = overlayPosition
+        self.supportAudio = supportAudio
+        self.allowSeeking = allowSeeking
+        self.allowFullscreen = allowFullscreen
+        self.showTimestamp = showTimestamp
+        self.allowSharing = allowSharing
     }
 
     public init?(data: Data) {
@@ -2812,6 +2827,11 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
         } else {
             return nil
         }
+        self.supportAudio = proto.supportAudio
+        self.allowSeeking = proto.allowSeeking
+        self.allowFullscreen = proto.allowFullscreen
+        self.showTimestamp = proto.showTimestamp
+        self.allowSharing = proto.allowSharing
     }
 }
 
