@@ -1607,6 +1607,18 @@ struct ProtoVideo: @unchecked Sendable {
     set {_uniqueStorage()._allowSharing = newValue}
   }
 
+  ///*
+  /// Provide meta data for the apps to send tracking data over
+  /// this video object
+  var tracking: ProtoEventTracking {
+    get {return _storage._tracking ?? ProtoEventTracking()}
+    set {_uniqueStorage()._tracking = newValue}
+  }
+  /// Returns true if `tracking` has been explicitly set.
+  var hasTracking: Bool {return _storage._tracking != nil}
+  /// Clears the value of `tracking`. Subsequent reads from it will return its default value.
+  mutating func clearTracking() {_uniqueStorage()._tracking = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -3347,6 +3359,19 @@ struct ProtoPermutive: Sendable {
   fileprivate var _series: String? = nil
 }
 
+///* For sending users' action tracking data to Ophan 
+struct ProtoEventTracking: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var componentID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
 ///* For some articles we return commissioning desk tracking (aka BasicTag)
 ///data based on if the article has a "tracking" tag which is set in CAPI.
 ///Commissioning desk data will never be included at the upper list level.
@@ -4823,7 +4848,7 @@ extension ProtoImage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
 
 extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Video"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}alt_text\0\u{1}caption\0\u{1}credit\0\u{1}height\0\u{1}orientation\0\u{1}url\0\u{1}width\0\u{3}youtube_id\0\u{3}duration_in_seconds\0\u{3}poster_image\0\u{3}is_live_video\0\u{3}video_id\0\u{1}platform\0\u{3}is_looping\0\u{3}is_autoplay\0\u{3}is_interactive\0\u{3}show_progress_bar\0\u{3}show_subtitles\0\u{3}overlay_position\0\u{3}support_audio\0\u{3}allow_seeking\0\u{3}allow_fullscreen\0\u{3}show_timestamp\0\u{3}allow_sharing\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}alt_text\0\u{1}caption\0\u{1}credit\0\u{1}height\0\u{1}orientation\0\u{1}url\0\u{1}width\0\u{3}youtube_id\0\u{3}duration_in_seconds\0\u{3}poster_image\0\u{3}is_live_video\0\u{3}video_id\0\u{1}platform\0\u{3}is_looping\0\u{3}is_autoplay\0\u{3}is_interactive\0\u{3}show_progress_bar\0\u{3}show_subtitles\0\u{3}overlay_position\0\u{3}support_audio\0\u{3}allow_seeking\0\u{3}allow_fullscreen\0\u{3}show_timestamp\0\u{3}allow_sharing\0\u{1}tracking\0")
 
   fileprivate class _StorageClass {
     var _altText: String? = nil
@@ -4850,6 +4875,7 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
     var _allowFullscreen: Bool = false
     var _showTimestamp: Bool = false
     var _allowSharing: Bool = false
+    var _tracking: ProtoEventTracking? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -4884,6 +4910,7 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
       _allowFullscreen = source._allowFullscreen
       _showTimestamp = source._showTimestamp
       _allowSharing = source._allowSharing
+      _tracking = source._tracking
     }
   }
 
@@ -4926,6 +4953,7 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
         case 22: try { try decoder.decodeSingularBoolField(value: &_storage._allowFullscreen) }()
         case 23: try { try decoder.decodeSingularBoolField(value: &_storage._showTimestamp) }()
         case 24: try { try decoder.decodeSingularBoolField(value: &_storage._allowSharing) }()
+        case 25: try { try decoder.decodeSingularMessageField(value: &_storage._tracking) }()
         default: break
         }
       }
@@ -5010,6 +5038,9 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
       if _storage._allowSharing != false {
         try visitor.visitSingularBoolField(value: _storage._allowSharing, fieldNumber: 24)
       }
+      try { if let v = _storage._tracking {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 25)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -5043,6 +5074,7 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
         if _storage._allowFullscreen != rhs_storage._allowFullscreen {return false}
         if _storage._showTimestamp != rhs_storage._showTimestamp {return false}
         if _storage._allowSharing != rhs_storage._allowSharing {return false}
+        if _storage._tracking != rhs_storage._tracking {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -6410,6 +6442,36 @@ extension ProtoPermutive: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
     if lhs.keywords != rhs.keywords {return false}
     if lhs._publishedAt != rhs._publishedAt {return false}
     if lhs._series != rhs._series {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ProtoEventTracking: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".EventTracking"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}component_id\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.componentID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.componentID.isEmpty {
+      try visitor.visitSingularStringField(value: self.componentID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoEventTracking, rhs: ProtoEventTracking) -> Bool {
+    if lhs.componentID != rhs.componentID {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
