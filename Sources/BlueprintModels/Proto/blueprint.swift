@@ -1192,6 +1192,30 @@ public struct BlueprintCompetitionWithMatchDays: Hashable, Equatable, Sendable {
     }
 }
 
+public struct BlueprintEventTracking: Hashable, Equatable, Sendable {
+    public let componentID: String
+    public private(set) var _backingData: Data?
+
+    public init(
+         componentID: String
+    ) {
+        self.componentID = componentID
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoEventTracking(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoEventTracking) {
+        self.componentID = proto.componentID
+    }
+}
+
 public struct BlueprintFollowUp: Hashable, Equatable, Sendable {
     public let type: BlueprintFollowUpType
     public let uri: URL
@@ -2692,6 +2716,10 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
     public let allowFullscreen: Bool
     public let showTimestamp: Bool
     public let allowSharing: Bool
+
+    // Provide meta data for the apps to send tracking data over
+    // this video object
+    public let tracking: BlueprintEventTracking
     public private(set) var _backingData: Data?
 
     public init(
@@ -2718,7 +2746,8 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
          allowSeeking: Bool,
          allowFullscreen: Bool,
          showTimestamp: Bool,
-         allowSharing: Bool
+         allowSharing: Bool,
+         tracking: BlueprintEventTracking
     ) {
         self.altText = altText
         self.caption = caption
@@ -2744,6 +2773,7 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
         self.allowFullscreen = allowFullscreen
         self.showTimestamp = showTimestamp
         self.allowSharing = allowSharing
+        self.tracking = tracking
     }
 
     public init?(data: Data) {
@@ -2832,6 +2862,11 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
         self.allowFullscreen = proto.allowFullscreen
         self.showTimestamp = proto.showTimestamp
         self.allowSharing = proto.allowSharing
+        if let tracking = BlueprintEventTracking(proto: proto.tracking) {
+            self.tracking = tracking
+        } else {
+            return nil
+        }
     }
 }
 
