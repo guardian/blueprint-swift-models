@@ -2720,6 +2720,9 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
     // Provide meta data for the apps to send tracking data over
     // this video object
     public let tracking: BlueprintEventTracking
+
+    // Auto hide UI controls on player
+    public let autoHideControls: Bool
     public private(set) var _backingData: Data?
 
     public init(
@@ -2747,7 +2750,8 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
          allowFullscreen: Bool,
          showTimestamp: Bool,
          allowSharing: Bool,
-         tracking: BlueprintEventTracking
+         tracking: BlueprintEventTracking,
+         autoHideControls: Bool
     ) {
         self.altText = altText
         self.caption = caption
@@ -2774,6 +2778,7 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
         self.showTimestamp = showTimestamp
         self.allowSharing = allowSharing
         self.tracking = tracking
+        self.autoHideControls = autoHideControls
     }
 
     public init?(data: Data) {
@@ -2867,6 +2872,7 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
         } else {
             return nil
         }
+        self.autoHideControls = proto.autoHideControls
     }
 }
 
