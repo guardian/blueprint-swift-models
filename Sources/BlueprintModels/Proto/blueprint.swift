@@ -2589,12 +2589,15 @@ public struct BlueprintTeam: Hashable, Equatable, Sendable {
 
 public struct BlueprintThrasher: Hashable, Equatable, Sendable {
     public let uri: URL
+    public let required: Bool
     public private(set) var _backingData: Data?
 
     public init(
-         uri: URL
+         uri: URL,
+         required: Bool
     ) {
         self.uri = uri
+        self.required = required
     }
 
     public init?(data: Data) {
@@ -2611,6 +2614,11 @@ public struct BlueprintThrasher: Hashable, Equatable, Sendable {
             self.uri = uri
         } else {
             return nil
+        }
+        if proto.hasRequired {
+            self.required = proto.required
+        } else {
+            self.required = false
         }
     }
 }
