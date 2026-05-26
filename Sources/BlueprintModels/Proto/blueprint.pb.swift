@@ -839,9 +839,21 @@ struct ProtoThrasher: Sendable {
 
   var uri: String = String()
 
+  /// Determines if the thrasher should be removable by the user.
+  var required: Bool {
+    get {return _required ?? false}
+    set {_required = newValue}
+  }
+  /// Returns true if `required` has been explicitly set.
+  var hasRequired: Bool {return self._required != nil}
+  /// Clears the value of `required`. Subsequent reads from it will return its default value.
+  mutating func clearRequired() {self._required = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
+
+  fileprivate var _required: Bool? = nil
 }
 
 ///*
@@ -4108,7 +4120,7 @@ extension ProtoFollowUp.FollowUpType: SwiftProtobuf._ProtoNameProviding {
 
 extension ProtoThrasher: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Thrasher"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}uri\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}uri\0\u{1}required\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -4117,20 +4129,29 @@ extension ProtoThrasher: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.uri) }()
+      case 2: try { try decoder.decodeSingularBoolField(value: &self._required) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.uri.isEmpty {
       try visitor.visitSingularStringField(value: self.uri, fieldNumber: 1)
     }
+    try { if let v = self._required {
+      try visitor.visitSingularBoolField(value: v, fieldNumber: 2)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: ProtoThrasher, rhs: ProtoThrasher) -> Bool {
     if lhs.uri != rhs.uri {return false}
+    if lhs._required != rhs._required {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
