@@ -220,6 +220,130 @@ enum ProtoTitleStyle: SwiftProtobuf.Enum, Swift.CaseIterable {
 
 }
 
+enum ProtoPuzzleType: SwiftProtobuf.Enum, Swift.CaseIterable {
+  typealias RawValue = Int
+  case unspecified // = 0
+  case crossword // = 1
+  case sudoku // = 2
+  case wordWheel // = 3
+  case wordiply // = 4
+  case onTheBall // = 5
+  case filmReveal // = 6
+  case UNRECOGNIZED(Int)
+
+  init() {
+    self = .unspecified
+  }
+
+  init?(rawValue: Int) {
+    switch rawValue {
+    case 0: self = .unspecified
+    case 1: self = .crossword
+    case 2: self = .sudoku
+    case 3: self = .wordWheel
+    case 4: self = .wordiply
+    case 5: self = .onTheBall
+    case 6: self = .filmReveal
+    default: self = .UNRECOGNIZED(rawValue)
+    }
+  }
+
+  var rawValue: Int {
+    switch self {
+    case .unspecified: return 0
+    case .crossword: return 1
+    case .sudoku: return 2
+    case .wordWheel: return 3
+    case .wordiply: return 4
+    case .onTheBall: return 5
+    case .filmReveal: return 6
+    case .UNRECOGNIZED(let i): return i
+    }
+  }
+
+  // The compiler won't synthesize support with the UNRECOGNIZED case.
+  static let allCases: [ProtoPuzzleType] = [
+    .unspecified,
+    .crossword,
+    .sudoku,
+    .wordWheel,
+    .wordiply,
+    .onTheBall,
+    .filmReveal,
+  ]
+
+}
+
+enum ProtoPuzzleSubType: SwiftProtobuf.Enum, Swift.CaseIterable {
+  typealias RawValue = Int
+  case unspecified // = 0
+  case quickCrossword // = 1
+  case miniCrossword // = 2
+  case crypticCrossword // = 3
+  case quickCryptic // = 4
+  case weekendCrossword // = 5
+  case crosswordArchive // = 6
+  case sudokuEasy // = 7
+  case sudokuMedium // = 8
+  case sudokuHard // = 9
+  case killerSudoku // = 10
+  case UNRECOGNIZED(Int)
+
+  init() {
+    self = .unspecified
+  }
+
+  init?(rawValue: Int) {
+    switch rawValue {
+    case 0: self = .unspecified
+    case 1: self = .quickCrossword
+    case 2: self = .miniCrossword
+    case 3: self = .crypticCrossword
+    case 4: self = .quickCryptic
+    case 5: self = .weekendCrossword
+    case 6: self = .crosswordArchive
+    case 7: self = .sudokuEasy
+    case 8: self = .sudokuMedium
+    case 9: self = .sudokuHard
+    case 10: self = .killerSudoku
+    default: self = .UNRECOGNIZED(rawValue)
+    }
+  }
+
+  var rawValue: Int {
+    switch self {
+    case .unspecified: return 0
+    case .quickCrossword: return 1
+    case .miniCrossword: return 2
+    case .crypticCrossword: return 3
+    case .quickCryptic: return 4
+    case .weekendCrossword: return 5
+    case .crosswordArchive: return 6
+    case .sudokuEasy: return 7
+    case .sudokuMedium: return 8
+    case .sudokuHard: return 9
+    case .killerSudoku: return 10
+    case .UNRECOGNIZED(let i): return i
+    }
+  }
+
+  // The compiler won't synthesize support with the UNRECOGNIZED case.
+  static let allCases: [ProtoPuzzleSubType] = [
+    .unspecified,
+    .quickCrossword,
+    .miniCrossword,
+    .crypticCrossword,
+    .quickCryptic,
+    .weekendCrossword,
+    .crosswordArchive,
+    .sudokuEasy,
+    .sudokuMedium,
+    .sudokuHard,
+    .killerSudoku,
+  ]
+
+}
+
 enum ProtoNavCardType: SwiftProtobuf.Enum, Swift.CaseIterable {
   typealias RawValue = Int
   case unspecified // = 0
@@ -1638,6 +1762,17 @@ struct ProtoVideo: @unchecked Sendable {
     set {_uniqueStorage()._autoHideControls = newValue}
   }
 
+  ///*
+  /// Aspect ratio of the video
+  var aspectRatio: String {
+    get {return _storage._aspectRatio ?? String()}
+    set {_uniqueStorage()._aspectRatio = newValue}
+  }
+  /// Returns true if `aspectRatio` has been explicitly set.
+  var hasAspectRatio: Bool {return _storage._aspectRatio != nil}
+  /// Clears the value of `aspectRatio`. Subsequent reads from it will return its default value.
+  mutating func clearAspectRatio() {_uniqueStorage()._aspectRatio = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -2313,6 +2448,70 @@ struct ProtoArticle: @unchecked Sendable {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
+/// For puzzle types that do not use sub types (e.g., WORDIPLY, WORD_WHEEL, 
+/// ON_THE_BALL, FILM_REVEAL), set sub_type = PUZZLE_SUB_TYPE_UNSPECIFIED. 
+/// This is the idiomatic way to represent "no sub type" in proto3 enums.
+struct ProtoPuzzle: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var type: ProtoPuzzleType {
+    get {return _type ?? .unspecified}
+    set {_type = newValue}
+  }
+  /// Returns true if `type` has been explicitly set.
+  var hasType: Bool {return self._type != nil}
+  /// Clears the value of `type`. Subsequent reads from it will return its default value.
+  mutating func clearType() {self._type = nil}
+
+  var subType: ProtoPuzzleSubType {
+    get {return _subType ?? .unspecified}
+    set {_subType = newValue}
+  }
+  /// Returns true if `subType` has been explicitly set.
+  var hasSubType: Bool {return self._subType != nil}
+  /// Clears the value of `subType`. Subsequent reads from it will return its default value.
+  mutating func clearSubType() {self._subType = nil}
+
+  var uri: String {
+    get {return _uri ?? String()}
+    set {_uri = newValue}
+  }
+  /// Returns true if `uri` has been explicitly set.
+  var hasUri: Bool {return self._uri != nil}
+  /// Clears the value of `uri`. Subsequent reads from it will return its default value.
+  mutating func clearUri() {self._uri = nil}
+
+  var id: String {
+    get {return _id ?? String()}
+    set {_id = newValue}
+  }
+  /// Returns true if `id` has been explicitly set.
+  var hasID: Bool {return self._id != nil}
+  /// Clears the value of `id`. Subsequent reads from it will return its default value.
+  mutating func clearID() {self._id = nil}
+
+  var title: String {
+    get {return _title ?? String()}
+    set {_title = newValue}
+  }
+  /// Returns true if `title` has been explicitly set.
+  var hasTitle: Bool {return self._title != nil}
+  /// Clears the value of `title`. Subsequent reads from it will return its default value.
+  mutating func clearTitle() {self._title = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _type: ProtoPuzzleType? = nil
+  fileprivate var _subType: ProtoPuzzleSubType? = nil
+  fileprivate var _uri: String? = nil
+  fileprivate var _id: String? = nil
+  fileprivate var _title: String? = nil
+}
+
 struct ProtoCard: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -2616,6 +2815,15 @@ struct ProtoCard: @unchecked Sendable {
   /// Clears the value of `condensedPaletteDark`. Subsequent reads from it will return its default value.
   mutating func clearCondensedPaletteDark() {_uniqueStorage()._condensedPaletteDark = nil}
 
+  var puzzle: ProtoPuzzle {
+    get {return _storage._puzzle ?? ProtoPuzzle()}
+    set {_uniqueStorage()._puzzle = newValue}
+  }
+  /// Returns true if `puzzle` has been explicitly set.
+  var hasPuzzle: Bool {return _storage._puzzle != nil}
+  /// Clears the value of `puzzle`. Subsequent reads from it will return its default value.
+  mutating func clearPuzzle() {_uniqueStorage()._puzzle = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   enum CardType: SwiftProtobuf.Enum, Swift.CaseIterable {
@@ -2660,6 +2868,10 @@ struct ProtoCard: @unchecked Sendable {
     ///*
     /// A card for a gallery item.
     case gallery // = 12
+
+    ///*
+    /// A card for a puzzle item.
+    case puzzle // = 13
     case UNRECOGNIZED(Int)
 
     init() {
@@ -2681,6 +2893,7 @@ struct ProtoCard: @unchecked Sendable {
       case 10: self = .highlight
       case 11: self = .navigation
       case 12: self = .gallery
+      case 13: self = .puzzle
       default: self = .UNRECOGNIZED(rawValue)
       }
     }
@@ -2700,6 +2913,7 @@ struct ProtoCard: @unchecked Sendable {
       case .highlight: return 10
       case .navigation: return 11
       case .gallery: return 12
+      case .puzzle: return 13
       case .UNRECOGNIZED(let i): return i
       }
     }
@@ -2719,6 +2933,7 @@ struct ProtoCard: @unchecked Sendable {
       .highlight,
       .navigation,
       .gallery,
+      .puzzle,
     ]
 
   }
@@ -3386,6 +3601,28 @@ struct ProtoEventTracking: Sendable {
 
   var componentID: String = String()
 
+  var abTests: [ProtoAbTestInfo] = []
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+///* Information about active A/B tests associated with this video. 
+struct ProtoAbTestInfo: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  ///* the name of the experiment. It should be used to populate 
+  /// the name field of AbTest object in Ophan's event model.
+  var name: String = String()
+
+  ///* the variant of the experiment this response is showing. 
+  /// It should be used to populate the variant name field of 
+  /// AbTest object in Ophan's event model.
+  var variant: String = String()
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -3813,6 +4050,14 @@ extension ProtoVideoOverlayPosition: SwiftProtobuf._ProtoNameProviding {
 
 extension ProtoTitleStyle: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0TITLE_STYLE_UNSPECIFIED\0\u{1}TITLE_STYLE_HIDDEN\0\u{1}TITLE_STYLE_REGULAR\0\u{1}TITLE_STYLE_SMALL\0")
+}
+
+extension ProtoPuzzleType: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0PUZZLE_TYPE_UNSPECIFIED\0\u{1}PUZZLE_TYPE_CROSSWORD\0\u{1}PUZZLE_TYPE_SUDOKU\0\u{1}PUZZLE_TYPE_WORD_WHEEL\0\u{1}PUZZLE_TYPE_WORDIPLY\0\u{1}PUZZLE_TYPE_ON_THE_BALL\0\u{1}PUZZLE_TYPE_FILM_REVEAL\0")
+}
+
+extension ProtoPuzzleSubType: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0PUZZLE_SUB_TYPE_UNSPECIFIED\0\u{1}PUZZLE_SUB_TYPE_QUICK_CROSSWORD\0\u{1}PUZZLE_SUB_TYPE_MINI_CROSSWORD\0\u{1}PUZZLE_SUB_TYPE_CRYPTIC_CROSSWORD\0\u{1}PUZZLE_SUB_TYPE_QUICK_CRYPTIC\0\u{1}PUZZLE_SUB_TYPE_WEEKEND_CROSSWORD\0\u{1}PUZZLE_SUB_TYPE_CROSSWORD_ARCHIVE\0\u{1}PUZZLE_SUB_TYPE_SUDOKU_EASY\0\u{1}PUZZLE_SUB_TYPE_SUDOKU_MEDIUM\0\u{1}PUZZLE_SUB_TYPE_SUDOKU_HARD\0\u{1}PUZZLE_SUB_TYPE_KILLER_SUDOKU\0")
 }
 
 extension ProtoNavCardType: SwiftProtobuf._ProtoNameProviding {
@@ -4876,7 +5121,7 @@ extension ProtoImage: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
 
 extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Video"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}alt_text\0\u{1}caption\0\u{1}credit\0\u{1}height\0\u{1}orientation\0\u{1}url\0\u{1}width\0\u{3}youtube_id\0\u{3}duration_in_seconds\0\u{3}poster_image\0\u{3}is_live_video\0\u{3}video_id\0\u{1}platform\0\u{3}is_looping\0\u{3}is_autoplay\0\u{3}is_interactive\0\u{3}show_progress_bar\0\u{3}show_subtitles\0\u{3}overlay_position\0\u{3}support_audio\0\u{3}allow_seeking\0\u{3}allow_fullscreen\0\u{3}show_timestamp\0\u{3}allow_sharing\0\u{1}tracking\0\u{3}auto_hide_controls\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}alt_text\0\u{1}caption\0\u{1}credit\0\u{1}height\0\u{1}orientation\0\u{1}url\0\u{1}width\0\u{3}youtube_id\0\u{3}duration_in_seconds\0\u{3}poster_image\0\u{3}is_live_video\0\u{3}video_id\0\u{1}platform\0\u{3}is_looping\0\u{3}is_autoplay\0\u{3}is_interactive\0\u{3}show_progress_bar\0\u{3}show_subtitles\0\u{3}overlay_position\0\u{3}support_audio\0\u{3}allow_seeking\0\u{3}allow_fullscreen\0\u{3}show_timestamp\0\u{3}allow_sharing\0\u{1}tracking\0\u{3}auto_hide_controls\0\u{3}aspect_ratio\0")
 
   fileprivate class _StorageClass {
     var _altText: String? = nil
@@ -4905,6 +5150,7 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
     var _allowSharing: Bool = false
     var _tracking: ProtoEventTracking? = nil
     var _autoHideControls: Bool = false
+    var _aspectRatio: String? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -4941,6 +5187,7 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
       _allowSharing = source._allowSharing
       _tracking = source._tracking
       _autoHideControls = source._autoHideControls
+      _aspectRatio = source._aspectRatio
     }
   }
 
@@ -4985,6 +5232,7 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
         case 24: try { try decoder.decodeSingularBoolField(value: &_storage._allowSharing) }()
         case 25: try { try decoder.decodeSingularMessageField(value: &_storage._tracking) }()
         case 26: try { try decoder.decodeSingularBoolField(value: &_storage._autoHideControls) }()
+        case 27: try { try decoder.decodeSingularStringField(value: &_storage._aspectRatio) }()
         default: break
         }
       }
@@ -5075,6 +5323,9 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
       if _storage._autoHideControls != false {
         try visitor.visitSingularBoolField(value: _storage._autoHideControls, fieldNumber: 26)
       }
+      try { if let v = _storage._aspectRatio {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 27)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -5110,6 +5361,7 @@ extension ProtoVideo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
         if _storage._allowSharing != rhs_storage._allowSharing {return false}
         if _storage._tracking != rhs_storage._tracking {return false}
         if _storage._autoHideControls != rhs_storage._autoHideControls {return false}
+        if _storage._aspectRatio != rhs_storage._aspectRatio {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -5841,9 +6093,63 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
   }
 }
 
+extension ProtoPuzzle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".Puzzle"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{3}sub_type\0\u{1}uri\0\u{1}id\0\u{1}title\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularEnumField(value: &self._type) }()
+      case 2: try { try decoder.decodeSingularEnumField(value: &self._subType) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self._uri) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self._id) }()
+      case 5: try { try decoder.decodeSingularStringField(value: &self._title) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._type {
+      try visitor.visitSingularEnumField(value: v, fieldNumber: 1)
+    } }()
+    try { if let v = self._subType {
+      try visitor.visitSingularEnumField(value: v, fieldNumber: 2)
+    } }()
+    try { if let v = self._uri {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._id {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 4)
+    } }()
+    try { if let v = self._title {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 5)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoPuzzle, rhs: ProtoPuzzle) -> Bool {
+    if lhs._type != rhs._type {return false}
+    if lhs._subType != rhs._subType {return false}
+    if lhs._uri != rhs._uri {return false}
+    if lhs._id != rhs._id {return false}
+    if lhs._title != rhs._title {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
 extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Card"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}article\0\u{1}boosted\0\u{1}compact\0\u{1}sublinks\0\u{3}html_fallback\0\u{1}branding\0\u{3}premium_content\0\u{3}sublinks_palette_light\0\u{3}sublinks_palette_dark\0\u{3}card_number\0\u{3}podcast_series\0\u{4}\u{19}corresponding_tags\0\u{3}mega_boosted\0\u{3}trail_image_size\0\u{4}\u{2}sublinks_arrangement\0\u{3}boosted_headline\0\u{3}headline_position\0\u{3}card_size\0\u{3}boost_level\0\u{3}preferred_sublinks_arrangement\0\u{3}top_border_style\0\u{3}headline_weight\0\u{3}nav_card_type\0\u{3}should_hide_image\0\u{3}condensed_palette_light\0\u{3}condensed_palette_dark\0\u{b}trail_image_aspect_ratio\0\u{c}(\u{1}")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}article\0\u{1}boosted\0\u{1}compact\0\u{1}sublinks\0\u{3}html_fallback\0\u{1}branding\0\u{3}premium_content\0\u{3}sublinks_palette_light\0\u{3}sublinks_palette_dark\0\u{3}card_number\0\u{3}podcast_series\0\u{4}\u{19}corresponding_tags\0\u{3}mega_boosted\0\u{3}trail_image_size\0\u{4}\u{2}sublinks_arrangement\0\u{3}boosted_headline\0\u{3}headline_position\0\u{3}card_size\0\u{3}boost_level\0\u{3}preferred_sublinks_arrangement\0\u{3}top_border_style\0\u{3}headline_weight\0\u{3}nav_card_type\0\u{3}should_hide_image\0\u{3}condensed_palette_light\0\u{3}condensed_palette_dark\0\u{1}puzzle\0\u{b}trail_image_aspect_ratio\0\u{c}(\u{1}")
 
   fileprivate class _StorageClass {
     var _type: ProtoCard.CardType = .unspecified
@@ -5873,6 +6179,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
     var _shouldHideImage: Bool? = nil
     var _condensedPaletteLight: ProtoPalette? = nil
     var _condensedPaletteDark: ProtoPalette? = nil
+    var _puzzle: ProtoPuzzle? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -5910,6 +6217,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
       _shouldHideImage = source._shouldHideImage
       _condensedPaletteLight = source._condensedPaletteLight
       _condensedPaletteDark = source._condensedPaletteDark
+      _puzzle = source._puzzle
     }
   }
 
@@ -5955,6 +6263,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
         case 50: try { try decoder.decodeSingularBoolField(value: &_storage._shouldHideImage) }()
         case 51: try { try decoder.decodeSingularMessageField(value: &_storage._condensedPaletteLight) }()
         case 52: try { try decoder.decodeSingularMessageField(value: &_storage._condensedPaletteDark) }()
+        case 53: try { try decoder.decodeSingularMessageField(value: &_storage._puzzle) }()
         default: break
         }
       }
@@ -6048,6 +6357,9 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
       try { if let v = _storage._condensedPaletteDark {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 52)
       } }()
+      try { if let v = _storage._puzzle {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 53)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -6084,6 +6396,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
         if _storage._shouldHideImage != rhs_storage._shouldHideImage {return false}
         if _storage._condensedPaletteLight != rhs_storage._condensedPaletteLight {return false}
         if _storage._condensedPaletteDark != rhs_storage._condensedPaletteDark {return false}
+        if _storage._puzzle != rhs_storage._puzzle {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -6094,7 +6407,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
 }
 
 extension ProtoCard.CardType: SwiftProtobuf._ProtoNameProviding {
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CARD_TYPE_UNSPECIFIED\0\u{1}CARD_TYPE_ARTICLE\0\u{1}CARD_TYPE_PODCAST\0\u{1}CARD_TYPE_VIDEO\0\u{1}CARD_TYPE_CROSSWORD\0\u{1}CARD_TYPE_DISPLAY\0\u{1}CARD_TYPE_NUMBERED\0\u{1}CARD_TYPE_EMPTY\0\u{1}CARD_TYPE_WEB_CONTENT\0\u{1}CARD_TYPE_PODCAST_SERIES\0\u{1}CARD_TYPE_HIGHLIGHT\0\u{1}CARD_TYPE_NAVIGATION\0\u{1}CARD_TYPE_GALLERY\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CARD_TYPE_UNSPECIFIED\0\u{1}CARD_TYPE_ARTICLE\0\u{1}CARD_TYPE_PODCAST\0\u{1}CARD_TYPE_VIDEO\0\u{1}CARD_TYPE_CROSSWORD\0\u{1}CARD_TYPE_DISPLAY\0\u{1}CARD_TYPE_NUMBERED\0\u{1}CARD_TYPE_EMPTY\0\u{1}CARD_TYPE_WEB_CONTENT\0\u{1}CARD_TYPE_PODCAST_SERIES\0\u{1}CARD_TYPE_HIGHLIGHT\0\u{1}CARD_TYPE_NAVIGATION\0\u{1}CARD_TYPE_GALLERY\0\u{1}CARD_TYPE_PUZZLE\0")
 }
 
 extension ProtoCard.SublinksArrangement: SwiftProtobuf._ProtoNameProviding {
@@ -6484,7 +6797,7 @@ extension ProtoPermutive: SwiftProtobuf.Message, SwiftProtobuf._MessageImplement
 
 extension ProtoEventTracking: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".EventTracking"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}component_id\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}component_id\0\u{3}ab_tests\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -6493,6 +6806,7 @@ extension ProtoEventTracking: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.componentID) }()
+      case 2: try { try decoder.decodeRepeatedMessageField(value: &self.abTests) }()
       default: break
       }
     }
@@ -6502,11 +6816,50 @@ extension ProtoEventTracking: SwiftProtobuf.Message, SwiftProtobuf._MessageImple
     if !self.componentID.isEmpty {
       try visitor.visitSingularStringField(value: self.componentID, fieldNumber: 1)
     }
+    if !self.abTests.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.abTests, fieldNumber: 2)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: ProtoEventTracking, rhs: ProtoEventTracking) -> Bool {
     if lhs.componentID != rhs.componentID {return false}
+    if lhs.abTests != rhs.abTests {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ProtoAbTestInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".AbTestInfo"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}name\0\u{1}variant\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.name) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.variant) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.name.isEmpty {
+      try visitor.visitSingularStringField(value: self.name, fieldNumber: 1)
+    }
+    if !self.variant.isEmpty {
+      try visitor.visitSingularStringField(value: self.variant, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoAbTestInfo, rhs: ProtoAbTestInfo) -> Bool {
+    if lhs.name != rhs.name {return false}
+    if lhs.variant != rhs.variant {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

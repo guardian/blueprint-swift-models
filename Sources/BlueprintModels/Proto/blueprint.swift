@@ -1,6 +1,41 @@
 import Foundation
 
 // MARK: - Structs
+public struct BlueprintAbTestInfo: Hashable, Equatable, Sendable {
+
+    // the name of the experiment. It should be used to populate
+    // the name field of AbTest object in Ophan's event model.
+    public let name: String
+
+    // the variant of the experiment this response is showing.
+    // It should be used to populate the variant name field of
+    // AbTest object in Ophan's event model.
+    public let variant: String
+    public private(set) var _backingData: Data?
+
+    public init(
+         name: String,
+         variant: String
+    ) {
+        self.name = name
+        self.variant = variant
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoAbTestInfo(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoAbTestInfo) {
+        self.name = proto.name
+        self.variant = proto.variant
+    }
+}
+
 public struct BlueprintAdTargetingParams: Hashable, Equatable, Sendable {
     public let adTargeting: [String: String]
     public private(set) var _backingData: Data?
@@ -642,6 +677,7 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
     // Provide a separate palette for Android's condensed view.
     public let condensedPaletteLight: BlueprintPalette?
     public let condensedPaletteDark: BlueprintPalette?
+    public let puzzle: BlueprintPuzzle?
     public let _localID = UUID()
     public private(set) var _backingData: Data?
 
@@ -672,7 +708,8 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
          navCardType: BlueprintNavCardType?,
          shouldHideImage: Bool,
          condensedPaletteLight: BlueprintPalette?,
-         condensedPaletteDark: BlueprintPalette?
+         condensedPaletteDark: BlueprintPalette?,
+         puzzle: BlueprintPuzzle?
     ) {
         self.type = type
         self.article = article
@@ -701,6 +738,7 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
         self.shouldHideImage = shouldHideImage
         self.condensedPaletteLight = condensedPaletteLight
         self.condensedPaletteDark = condensedPaletteDark
+        self.puzzle = puzzle
     }
 
     public init?(data: Data) {
@@ -839,6 +877,11 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
             self.condensedPaletteDark = BlueprintPalette(proto: proto.condensedPaletteDark)
         } else {
             self.condensedPaletteDark = nil
+        }
+        if proto.hasPuzzle {
+            self.puzzle = BlueprintPuzzle(proto: proto.puzzle)
+        } else {
+            self.puzzle = nil
         }
     }
 }
@@ -1194,12 +1237,15 @@ public struct BlueprintCompetitionWithMatchDays: Hashable, Equatable, Sendable {
 
 public struct BlueprintEventTracking: Hashable, Equatable, Sendable {
     public let componentID: String
+    public let abTests: [BlueprintAbTestInfo]
     public private(set) var _backingData: Data?
 
     public init(
-         componentID: String
+         componentID: String,
+         abTests: [BlueprintAbTestInfo]
     ) {
         self.componentID = componentID
+        self.abTests = abTests
     }
 
     public init?(data: Data) {
@@ -1213,6 +1259,7 @@ public struct BlueprintEventTracking: Hashable, Equatable, Sendable {
 
     internal init?(proto: ProtoEventTracking) {
         self.componentID = proto.componentID
+        self.abTests = proto.abTests.compactMap { BlueprintAbTestInfo(proto: $0) }
     }
 }
 
@@ -2197,6 +2244,66 @@ public struct BlueprintPodcastSeries: Hashable, Equatable, Sendable {
     }
 }
 
+public struct BlueprintPuzzle: Hashable, Equatable, Sendable {
+    public let type: BlueprintPuzzleType?
+    public let subType: BlueprintPuzzleSubType?
+    public let uri: URL?
+    public let id: String?
+    public let title: String?
+    public private(set) var _backingData: Data?
+
+    public init(
+         type: BlueprintPuzzleType?,
+         subType: BlueprintPuzzleSubType?,
+         uri: URL?,
+         id: String?,
+         title: String?
+    ) {
+        self.type = type
+        self.subType = subType
+        self.uri = uri
+        self.id = id
+        self.title = title
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoPuzzle(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoPuzzle) {
+        if proto.hasType {
+            self.type = BlueprintPuzzleType(proto: proto.type)
+        } else {
+            self.type = nil
+        }
+        if proto.hasSubType {
+            self.subType = BlueprintPuzzleSubType(proto: proto.subType)
+        } else {
+            self.subType = nil
+        }
+        if proto.hasUri {
+            self.uri = URL(string: proto.uri)
+        } else {
+            self.uri = nil
+        }
+        if proto.hasId {
+            self.id = proto.id
+        } else {
+            self.id = nil
+        }
+        if proto.hasTitle {
+            self.title = proto.title
+        } else {
+            self.title = nil
+        }
+    }
+}
+
 public struct BlueprintRenderingPlatformSupport: Hashable, Equatable, Sendable {
     public let minBridgetVersion: String
     public let uri: URL
@@ -2731,6 +2838,9 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
 
     // Auto hide UI controls on player
     public let autoHideControls: Bool
+
+    // Aspect ratio of the video
+    public let aspectRatio: String?
     public private(set) var _backingData: Data?
 
     public init(
@@ -2759,7 +2869,8 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
          showTimestamp: Bool,
          allowSharing: Bool,
          tracking: BlueprintEventTracking,
-         autoHideControls: Bool
+         autoHideControls: Bool,
+         aspectRatio: String?
     ) {
         self.altText = altText
         self.caption = caption
@@ -2787,6 +2898,7 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
         self.allowSharing = allowSharing
         self.tracking = tracking
         self.autoHideControls = autoHideControls
+        self.aspectRatio = aspectRatio
     }
 
     public init?(data: Data) {
@@ -2881,6 +2993,11 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
             return nil
         }
         self.autoHideControls = proto.autoHideControls
+        if proto.hasAspectRatio {
+            self.aspectRatio = proto.aspectRatio
+        } else {
+            self.aspectRatio = nil
+        }
     }
 }
 
@@ -2934,6 +3051,7 @@ extension BlueprintCard {
         case highlight = 10
         case navigation = 11
         case gallery = 12
+        case puzzle = 13
 
         internal init?(proto: ProtoCard.CardType) {
             self.init(rawValue: proto.rawValue)
@@ -3089,6 +3207,38 @@ public enum BlueprintPlatform: Int, CaseIterable, Hashable, Equatable, Sendable 
     case url = 2
 
     internal init?(proto: ProtoPlatform) {
+        self.init(rawValue: proto.rawValue)
+    }
+}
+
+public enum BlueprintPuzzleSubType: Int, CaseIterable, Hashable, Equatable, Sendable {
+    case unspecified = 0
+    case quickCrossword = 1
+    case miniCrossword = 2
+    case crypticCrossword = 3
+    case quickCryptic = 4
+    case weekendCrossword = 5
+    case crosswordArchive = 6
+    case sudokuEasy = 7
+    case sudokuMedium = 8
+    case sudokuHard = 9
+    case killerSudoku = 10
+
+    internal init?(proto: ProtoPuzzleSubType) {
+        self.init(rawValue: proto.rawValue)
+    }
+}
+
+public enum BlueprintPuzzleType: Int, CaseIterable, Hashable, Equatable, Sendable {
+    case unspecified = 0
+    case crossword = 1
+    case sudoku = 2
+    case wordWheel = 3
+    case wordiply = 4
+    case onTheBall = 5
+    case filmReveal = 6
+
+    internal init?(proto: ProtoPuzzleType) {
         self.init(rawValue: proto.rawValue)
     }
 }
