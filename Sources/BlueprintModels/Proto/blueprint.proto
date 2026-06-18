@@ -418,6 +418,10 @@ message Video {
    * Auto hide UI controls on player
    */
   bool auto_hide_controls = 26;
+  /**
+   * Aspect ratio of the video
+   */
+  optional string aspect_ratio = 27;
 }
 
 message Audio {
@@ -575,6 +579,41 @@ message Article {
   optional MediaPill media_pill = 40;
 }
 
+enum PuzzleType {
+  PUZZLE_TYPE_UNSPECIFIED = 0;
+  PUZZLE_TYPE_CROSSWORD = 1;
+  PUZZLE_TYPE_SUDOKU = 2;
+  PUZZLE_TYPE_WORD_WHEEL = 3;
+  PUZZLE_TYPE_WORDIPLY = 4;
+  PUZZLE_TYPE_ON_THE_BALL = 5;
+  PUZZLE_TYPE_FILM_REVEAL = 6;
+}
+
+enum PuzzleSubType {
+  PUZZLE_SUB_TYPE_UNSPECIFIED = 0;
+  PUZZLE_SUB_TYPE_QUICK_CROSSWORD = 1;
+  PUZZLE_SUB_TYPE_MINI_CROSSWORD = 2;
+  PUZZLE_SUB_TYPE_CRYPTIC_CROSSWORD = 3;
+  PUZZLE_SUB_TYPE_QUICK_CRYPTIC = 4;
+  PUZZLE_SUB_TYPE_WEEKEND_CROSSWORD = 5;
+  PUZZLE_SUB_TYPE_CROSSWORD_ARCHIVE = 6;
+  PUZZLE_SUB_TYPE_SUDOKU_EASY = 7;
+  PUZZLE_SUB_TYPE_SUDOKU_MEDIUM = 8;
+  PUZZLE_SUB_TYPE_SUDOKU_HARD = 9;
+  PUZZLE_SUB_TYPE_KILLER_SUDOKU = 10;
+}
+
+// For puzzle types that do not use sub types (e.g., WORDIPLY, WORD_WHEEL, 
+// ON_THE_BALL, FILM_REVEAL), set sub_type = PUZZLE_SUB_TYPE_UNSPECIFIED. 
+// This is the idiomatic way to represent "no sub type" in proto3 enums.
+message Puzzle {
+  optional PuzzleType type = 1;
+  optional PuzzleSubType sub_type = 2;
+  optional string uri = 3;
+  optional string id = 4;
+  optional string title = 5;
+}
+
 message Card {
   enum CardType {
     CARD_TYPE_UNSPECIFIED = 0;
@@ -618,6 +657,10 @@ message Card {
      * A card for a gallery item.
      */
     CARD_TYPE_GALLERY = 12;
+    /**
+     * A card for a puzzle item.
+     */
+    CARD_TYPE_PUZZLE = 13;
   }
   CardType type = 1;
   /**
@@ -788,6 +831,8 @@ message Card {
    */
   optional Palette condensed_palette_light = 51;
   optional Palette condensed_palette_dark = 52;
+
+  optional Puzzle puzzle = 53;
 
 }
 
@@ -987,6 +1032,21 @@ message Permutive {
 /** For sending users' action tracking data to Ophan */
 message EventTracking {
   string component_id = 1;
+  repeated AbTestInfo ab_tests = 2;
+}
+
+/** Information about active A/B tests associated with this video. */
+message AbTestInfo {
+  /** the name of the experiment. It should be used to populate 
+   * the name field of AbTest object in Ophan's event model.
+   */
+  string name = 1;
+
+  /** the variant of the experiment this response is showing. 
+   * It should be used to populate the variant name field of 
+   * AbTest object in Ophan's event model.
+   */
+  string variant = 2; 
 }
 
 /** For some articles we return commissioning desk tracking (aka BasicTag)
