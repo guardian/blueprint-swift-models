@@ -43,6 +43,8 @@ extension BlueprintCard.BlueprintCardType: CustomStringConvertible {
             "Navigation"
         case .gallery:
             "Gallery"
+        case .puzzle:
+            "Puzzle"
         }
     }
 }

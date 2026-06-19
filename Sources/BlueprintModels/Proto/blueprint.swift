@@ -2291,7 +2291,7 @@ public struct BlueprintPuzzle: Hashable, Equatable, Sendable {
         } else {
             self.uri = nil
         }
-        if proto.hasId {
+        if proto.hasID {
             self.id = proto.id
         } else {
             self.id = nil
