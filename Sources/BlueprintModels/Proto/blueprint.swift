@@ -970,6 +970,7 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
     // The default aspect ratio for trail images in this collection.
     public let preferredImageAspectRatio: BlueprintImageAspectRatio?
     public let tightenVerticalSpacing: Bool
+    public let references: BlueprintTagReferences?
     public private(set) var _backingData: Data?
 
     public init(
@@ -996,7 +997,8 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
          lastUpdatedDate: Date?,
          titleStyle: BlueprintTitleStyle?,
          preferredImageAspectRatio: BlueprintImageAspectRatio?,
-         tightenVerticalSpacing: Bool
+         tightenVerticalSpacing: Bool,
+         references: BlueprintTagReferences?
     ) {
         self.id = id
         self.paletteLight = paletteLight
@@ -1022,6 +1024,7 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
         self.titleStyle = titleStyle
         self.preferredImageAspectRatio = preferredImageAspectRatio
         self.tightenVerticalSpacing = tightenVerticalSpacing
+        self.references = references
     }
 
     public init?(data: Data) {
@@ -1141,6 +1144,11 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
             self.tightenVerticalSpacing = proto.tightenVerticalSpacing
         } else {
             self.tightenVerticalSpacing = false
+        }
+        if proto.hasReferences {
+            self.references = BlueprintTagReferences(proto: proto.references)
+        } else {
+            self.references = nil
         }
     }
 }
@@ -1476,6 +1484,7 @@ public struct BlueprintLayoutAgnosticCollection: Hashable, Equatable, Sendable {
     // the tracking data.
     public let trackingID: String?
     public let image: BlueprintImage?
+    public let references: BlueprintTagReferences?
     public private(set) var _backingData: Data?
 
     public init(
@@ -1486,7 +1495,8 @@ public struct BlueprintLayoutAgnosticCollection: Hashable, Equatable, Sendable {
          title: String?,
          followUp: BlueprintFollowUp?,
          trackingID: String?,
-         image: BlueprintImage?
+         image: BlueprintImage?,
+         references: BlueprintTagReferences?
     ) {
         self.id = id
         self.paletteLight = paletteLight
@@ -1496,6 +1506,7 @@ public struct BlueprintLayoutAgnosticCollection: Hashable, Equatable, Sendable {
         self.followUp = followUp
         self.trackingID = trackingID
         self.image = image
+        self.references = references
     }
 
     public init?(data: Data) {
@@ -1539,6 +1550,11 @@ public struct BlueprintLayoutAgnosticCollection: Hashable, Equatable, Sendable {
             self.image = BlueprintImage(proto: proto.image)
         } else {
             self.image = nil
+        }
+        if proto.hasReferences {
+            self.references = BlueprintTagReferences(proto: proto.references)
+        } else {
+            self.references = nil
         }
     }
 }
@@ -1984,16 +2000,19 @@ public struct BlueprintMyGuardianFollow: Hashable, Equatable, Sendable {
     public let id: String
     public let webTitle: String
     public let type: BlueprintFollowType
+    public let references: BlueprintTagReferences?
     public private(set) var _backingData: Data?
 
     public init(
          id: String,
          webTitle: String,
-         type: BlueprintFollowType
+         type: BlueprintFollowType,
+         references: BlueprintTagReferences?
     ) {
         self.id = id
         self.webTitle = webTitle
         self.type = type
+        self.references = references
     }
 
     public init?(data: Data) {
@@ -2012,6 +2031,11 @@ public struct BlueprintMyGuardianFollow: Hashable, Equatable, Sendable {
             self.type = type
         } else {
             return nil
+        }
+        if proto.hasReferences {
+            self.references = BlueprintTagReferences(proto: proto.references)
+        } else {
+            self.references = nil
         }
     }
 }
@@ -2245,25 +2269,30 @@ public struct BlueprintPodcastSeries: Hashable, Equatable, Sendable {
 }
 
 public struct BlueprintPuzzle: Hashable, Equatable, Sendable {
-    public let type: BlueprintPuzzleType?
-    public let subType: BlueprintPuzzleSubType?
-    public let uri: URL?
-    public let id: String?
-    public let title: String?
+
+    // The old puzzle type & sub_type fields are deprecated in favour of the new
+    // puzzle_types enum.
+    // reserved 1;
+    // reserved "type";
+    // reserved 2;
+    // reserved "sub_type";
+    // optional string uri = 3;
+    // optional string id = 4;
+    // optional string title = 5;
+    // optional Palette palette_light = 6;
+    // optional Palette palette_dark = 7;
+    // optional Image image_light = 8;
+    // optional Image image_dark = 9;
+    // PuzzleTypes puzzle_types = 10;
+    // The frequency of the puzzle, e.g. "Daily", "Weekly", "Monthly".
+    // This is used to display the frequency on the card.
+    public let frequency: String?
     public private(set) var _backingData: Data?
 
     public init(
-         type: BlueprintPuzzleType?,
-         subType: BlueprintPuzzleSubType?,
-         uri: URL?,
-         id: String?,
-         title: String?
+         frequency: String?
     ) {
-        self.type = type
-        self.subType = subType
-        self.uri = uri
-        self.id = id
-        self.title = title
+        self.frequency = frequency
     }
 
     public init?(data: Data) {
@@ -2276,30 +2305,10 @@ public struct BlueprintPuzzle: Hashable, Equatable, Sendable {
     }
 
     internal init?(proto: ProtoPuzzle) {
-        if proto.hasType {
-            self.type = BlueprintPuzzleType(proto: proto.type)
+        if proto.hasFrequency {
+            self.frequency = proto.frequency
         } else {
-            self.type = nil
-        }
-        if proto.hasSubType {
-            self.subType = BlueprintPuzzleSubType(proto: proto.subType)
-        } else {
-            self.subType = nil
-        }
-        if proto.hasUri {
-            self.uri = URL(string: proto.uri)
-        } else {
-            self.uri = nil
-        }
-        if proto.hasID {
-            self.id = proto.id
-        } else {
-            self.id = nil
-        }
-        if proto.hasTitle {
-            self.title = proto.title
-        } else {
-            self.title = nil
+            self.frequency = nil
         }
     }
 }
@@ -2642,6 +2651,34 @@ public struct BlueprintTablePosition: Hashable, Equatable, Sendable {
             self.followUp = BlueprintFollowUp(proto: proto.followUp)
         } else {
             self.followUp = nil
+        }
+    }
+}
+
+public struct BlueprintTagReferences: Hashable, Equatable, Sendable {
+    public let paFootballTeam: String?
+    public private(set) var _backingData: Data?
+
+    public init(
+         paFootballTeam: String?
+    ) {
+        self.paFootballTeam = paFootballTeam
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoTagReferences(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoTagReferences) {
+        if proto.hasPaFootballTeam {
+            self.paFootballTeam = proto.paFootballTeam
+        } else {
+            self.paFootballTeam = nil
         }
     }
 }
@@ -3239,6 +3276,30 @@ public enum BlueprintPuzzleType: Int, CaseIterable, Hashable, Equatable, Sendabl
     case filmReveal = 6
 
     internal init?(proto: ProtoPuzzleType) {
+        self.init(rawValue: proto.rawValue)
+    }
+}
+
+public enum BlueprintPuzzleTypes: Int, CaseIterable, Hashable, Equatable, Sendable {
+    case unspecified = 0
+    case crosswordQuick = 1
+    case crosswordMini = 2
+    case crosswordCryptic = 3
+    case crosswordQuickcryptic = 4
+    case crosswordWeekend = 5
+    case crosswordPrize = 11
+    case crosswordQuiptic = 12
+    case crosswordSundayquick = 13
+    case sudokuEasy = 7
+    case sudokuMedium = 8
+    case sudokuHard = 9
+    case sudokuKiller = 10
+    case wordwheel = 14
+    case wordiply = 15
+    case ontheball = 16
+    case filmreveal = 17
+
+    internal init?(proto: ProtoPuzzleTypes) {
         self.init(rawValue: proto.rawValue)
     }
 }
