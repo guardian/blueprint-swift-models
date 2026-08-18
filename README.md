@@ -4,7 +4,7 @@ These models are used to communicate between MAPI and the native apps. This repo
 
 ### How do I update the models? 
 
-You can update the models by running the update-blueprint-models.sh script. The [mobile-apps-api-models](https://github.com/guardian/mobile-apps-api-models) repo contains the contains a blueprint.proto file, copy a version of this file and replace ./BlueprintModels/Sources/BlueprintModels/Proto/blueprint.proto within this repo.
+You can update the models by running the update-blueprint-models.sh script. The [mobile-apps-api-models](https://github.com/guardian/mobile-apps-api-models) repo contains the contains a blueprint.proto file, copy a version of this file and replace ./BlueprintModels/Sources/BlueprintModels/Proto/blueprint.proto within this repo. Also, delete the generated swift files.
 
 Run the update-blueprint-models.sh script from the ./Scripts/ folder. The script knows the location of the blueprint.proto file and will update the swift-protobuf and Swift Buffet files to reflect any local changes to the blueprint.proto file.
 
