@@ -220,6 +220,9 @@ enum ProtoTitleStyle: SwiftProtobuf.Enum, Swift.CaseIterable {
 
 }
 
+///* Deprecated. Please just use the `PuzzleTypes` enum instead. 
+///
+/// NOTE: This enum was marked as deprecated in the .proto file.
 enum ProtoPuzzleType: SwiftProtobuf.Enum, Swift.CaseIterable {
   typealias RawValue = Int
   case unspecified // = 0
@@ -274,6 +277,9 @@ enum ProtoPuzzleType: SwiftProtobuf.Enum, Swift.CaseIterable {
 
 }
 
+///* Deprecated. Please just use the `PuzzleTypes` enum instead. 
+///
+/// NOTE: This enum was marked as deprecated in the .proto file.
 enum ProtoPuzzleSubType: SwiftProtobuf.Enum, Swift.CaseIterable {
   typealias RawValue = Int
   case unspecified // = 0
@@ -340,6 +346,100 @@ enum ProtoPuzzleSubType: SwiftProtobuf.Enum, Swift.CaseIterable {
     .sudokuMedium,
     .sudokuHard,
     .killerSudoku,
+  ]
+
+}
+
+enum ProtoPuzzleTypes: SwiftProtobuf.Enum, Swift.CaseIterable {
+  typealias RawValue = Int
+  case unspecified // = 0
+  case crosswordQuick // = 1
+  case crosswordMini // = 2
+  case crosswordCryptic // = 3
+  case crosswordQuickcryptic // = 4
+  case crosswordWeekend // = 5
+  case crosswordPrize // = 11
+  case crosswordQuiptic // = 12
+  case crosswordSundayquick // = 13
+  case sudokuEasy // = 7
+  case sudokuMedium // = 8
+  case sudokuHard // = 9
+  case sudokuKiller // = 10
+  case wordwheel // = 14
+  case wordiply // = 15
+  case ontheball // = 16
+  case filmreveal // = 17
+  case UNRECOGNIZED(Int)
+
+  init() {
+    self = .unspecified
+  }
+
+  init?(rawValue: Int) {
+    switch rawValue {
+    case 0: self = .unspecified
+    case 1: self = .crosswordQuick
+    case 2: self = .crosswordMini
+    case 3: self = .crosswordCryptic
+    case 4: self = .crosswordQuickcryptic
+    case 5: self = .crosswordWeekend
+    case 7: self = .sudokuEasy
+    case 8: self = .sudokuMedium
+    case 9: self = .sudokuHard
+    case 10: self = .sudokuKiller
+    case 11: self = .crosswordPrize
+    case 12: self = .crosswordQuiptic
+    case 13: self = .crosswordSundayquick
+    case 14: self = .wordwheel
+    case 15: self = .wordiply
+    case 16: self = .ontheball
+    case 17: self = .filmreveal
+    default: self = .UNRECOGNIZED(rawValue)
+    }
+  }
+
+  var rawValue: Int {
+    switch self {
+    case .unspecified: return 0
+    case .crosswordQuick: return 1
+    case .crosswordMini: return 2
+    case .crosswordCryptic: return 3
+    case .crosswordQuickcryptic: return 4
+    case .crosswordWeekend: return 5
+    case .sudokuEasy: return 7
+    case .sudokuMedium: return 8
+    case .sudokuHard: return 9
+    case .sudokuKiller: return 10
+    case .crosswordPrize: return 11
+    case .crosswordQuiptic: return 12
+    case .crosswordSundayquick: return 13
+    case .wordwheel: return 14
+    case .wordiply: return 15
+    case .ontheball: return 16
+    case .filmreveal: return 17
+    case .UNRECOGNIZED(let i): return i
+    }
+  }
+
+  // The compiler won't synthesize support with the UNRECOGNIZED case.
+  static let allCases: [ProtoPuzzleTypes] = [
+    .unspecified,
+    .crosswordQuick,
+    .crosswordMini,
+    .crosswordCryptic,
+    .crosswordQuickcryptic,
+    .crosswordWeekend,
+    .crosswordPrize,
+    .crosswordQuiptic,
+    .crosswordSundayquick,
+    .sudokuEasy,
+    .sudokuMedium,
+    .sudokuHard,
+    .sudokuKiller,
+    .wordwheel,
+    .wordiply,
+    .ontheball,
+    .filmreveal,
   ]
 
 }
@@ -779,6 +879,15 @@ struct ProtoCollection: @unchecked Sendable {
   var hasTightenVerticalSpacing: Bool {return _storage._tightenVerticalSpacing != nil}
   /// Clears the value of `tightenVerticalSpacing`. Subsequent reads from it will return its default value.
   mutating func clearTightenVerticalSpacing() {_uniqueStorage()._tightenVerticalSpacing = nil}
+
+  var references: ProtoTagReferences {
+    get {return _storage._references ?? ProtoTagReferences()}
+    set {_uniqueStorage()._references = newValue}
+  }
+  /// Returns true if `references` has been explicitly set.
+  var hasReferences: Bool {return _storage._references != nil}
+  /// Clears the value of `references`. Subsequent reads from it will return its default value.
+  mutating func clearReferences() {_uniqueStorage()._references = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1312,6 +1421,15 @@ struct ProtoLayoutAgnosticCollection: Sendable {
   /// Clears the value of `image`. Subsequent reads from it will return its default value.
   mutating func clearImage() {self._image = nil}
 
+  var references: ProtoTagReferences {
+    get {return _references ?? ProtoTagReferences()}
+    set {_references = newValue}
+  }
+  /// Returns true if `references` has been explicitly set.
+  var hasReferences: Bool {return self._references != nil}
+  /// Clears the value of `references`. Subsequent reads from it will return its default value.
+  mutating func clearReferences() {self._references = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -1322,6 +1440,7 @@ struct ProtoLayoutAgnosticCollection: Sendable {
   fileprivate var _followUp: ProtoFollowUp? = nil
   fileprivate var _trackingID: String? = nil
   fileprivate var _image: ProtoImage? = nil
+  fileprivate var _references: ProtoTagReferences? = nil
 }
 
 struct ProtoPalette: @unchecked Sendable {
@@ -2448,68 +2567,99 @@ struct ProtoArticle: @unchecked Sendable {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
-/// For puzzle types that do not use sub types (e.g., WORDIPLY, WORD_WHEEL, 
-/// ON_THE_BALL, FILM_REVEAL), set sub_type = PUZZLE_SUB_TYPE_UNSPECIFIED. 
-/// This is the idiomatic way to represent "no sub type" in proto3 enums.
-struct ProtoPuzzle: Sendable {
+///*
+/// The old puzzle type & sub_type fields are deprecated in favour of the new 
+/// puzzle_types enum.
+struct ProtoPuzzle: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var type: ProtoPuzzleType {
-    get {return _type ?? .unspecified}
-    set {_type = newValue}
-  }
-  /// Returns true if `type` has been explicitly set.
-  var hasType: Bool {return self._type != nil}
-  /// Clears the value of `type`. Subsequent reads from it will return its default value.
-  mutating func clearType() {self._type = nil}
-
-  var subType: ProtoPuzzleSubType {
-    get {return _subType ?? .unspecified}
-    set {_subType = newValue}
-  }
-  /// Returns true if `subType` has been explicitly set.
-  var hasSubType: Bool {return self._subType != nil}
-  /// Clears the value of `subType`. Subsequent reads from it will return its default value.
-  mutating func clearSubType() {self._subType = nil}
-
   var uri: String {
-    get {return _uri ?? String()}
-    set {_uri = newValue}
+    get {return _storage._uri ?? String()}
+    set {_uniqueStorage()._uri = newValue}
   }
   /// Returns true if `uri` has been explicitly set.
-  var hasUri: Bool {return self._uri != nil}
+  var hasUri: Bool {return _storage._uri != nil}
   /// Clears the value of `uri`. Subsequent reads from it will return its default value.
-  mutating func clearUri() {self._uri = nil}
+  mutating func clearUri() {_uniqueStorage()._uri = nil}
 
   var id: String {
-    get {return _id ?? String()}
-    set {_id = newValue}
+    get {return _storage._id ?? String()}
+    set {_uniqueStorage()._id = newValue}
   }
   /// Returns true if `id` has been explicitly set.
-  var hasID: Bool {return self._id != nil}
+  var hasID: Bool {return _storage._id != nil}
   /// Clears the value of `id`. Subsequent reads from it will return its default value.
-  mutating func clearID() {self._id = nil}
+  mutating func clearID() {_uniqueStorage()._id = nil}
 
   var title: String {
-    get {return _title ?? String()}
-    set {_title = newValue}
+    get {return _storage._title ?? String()}
+    set {_uniqueStorage()._title = newValue}
   }
   /// Returns true if `title` has been explicitly set.
-  var hasTitle: Bool {return self._title != nil}
+  var hasTitle: Bool {return _storage._title != nil}
   /// Clears the value of `title`. Subsequent reads from it will return its default value.
-  mutating func clearTitle() {self._title = nil}
+  mutating func clearTitle() {_uniqueStorage()._title = nil}
+
+  var paletteLight: ProtoPalette {
+    get {return _storage._paletteLight ?? ProtoPalette()}
+    set {_uniqueStorage()._paletteLight = newValue}
+  }
+  /// Returns true if `paletteLight` has been explicitly set.
+  var hasPaletteLight: Bool {return _storage._paletteLight != nil}
+  /// Clears the value of `paletteLight`. Subsequent reads from it will return its default value.
+  mutating func clearPaletteLight() {_uniqueStorage()._paletteLight = nil}
+
+  var paletteDark: ProtoPalette {
+    get {return _storage._paletteDark ?? ProtoPalette()}
+    set {_uniqueStorage()._paletteDark = newValue}
+  }
+  /// Returns true if `paletteDark` has been explicitly set.
+  var hasPaletteDark: Bool {return _storage._paletteDark != nil}
+  /// Clears the value of `paletteDark`. Subsequent reads from it will return its default value.
+  mutating func clearPaletteDark() {_uniqueStorage()._paletteDark = nil}
+
+  var imageLight: ProtoImage {
+    get {return _storage._imageLight ?? ProtoImage()}
+    set {_uniqueStorage()._imageLight = newValue}
+  }
+  /// Returns true if `imageLight` has been explicitly set.
+  var hasImageLight: Bool {return _storage._imageLight != nil}
+  /// Clears the value of `imageLight`. Subsequent reads from it will return its default value.
+  mutating func clearImageLight() {_uniqueStorage()._imageLight = nil}
+
+  var imageDark: ProtoImage {
+    get {return _storage._imageDark ?? ProtoImage()}
+    set {_uniqueStorage()._imageDark = newValue}
+  }
+  /// Returns true if `imageDark` has been explicitly set.
+  var hasImageDark: Bool {return _storage._imageDark != nil}
+  /// Clears the value of `imageDark`. Subsequent reads from it will return its default value.
+  mutating func clearImageDark() {_uniqueStorage()._imageDark = nil}
+
+  var puzzleTypes: ProtoPuzzleTypes {
+    get {return _storage._puzzleTypes}
+    set {_uniqueStorage()._puzzleTypes = newValue}
+  }
+
+  ///* 
+  /// The frequency of the puzzle, e.g. "Daily", "Weekly", "Monthly".
+  /// This is used to display the frequency on the card.
+  var frequency: String {
+    get {return _storage._frequency ?? String()}
+    set {_uniqueStorage()._frequency = newValue}
+  }
+  /// Returns true if `frequency` has been explicitly set.
+  var hasFrequency: Bool {return _storage._frequency != nil}
+  /// Clears the value of `frequency`. Subsequent reads from it will return its default value.
+  mutating func clearFrequency() {_uniqueStorage()._frequency = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
 
-  fileprivate var _type: ProtoPuzzleType? = nil
-  fileprivate var _subType: ProtoPuzzleSubType? = nil
-  fileprivate var _uri: String? = nil
-  fileprivate var _id: String? = nil
-  fileprivate var _title: String? = nil
+  fileprivate var _storage = _StorageClass.defaultInstance
 }
 
 struct ProtoCard: @unchecked Sendable {
@@ -3397,6 +3547,15 @@ struct ProtoMyGuardianFollow: Sendable {
 
   var type: ProtoMyGuardianFollow.FollowType = .unspecified
 
+  var references: ProtoTagReferences {
+    get {return _references ?? ProtoTagReferences()}
+    set {_references = newValue}
+  }
+  /// Returns true if `references` has been explicitly set.
+  var hasReferences: Bool {return self._references != nil}
+  /// Clears the value of `references`. Subsequent reads from it will return its default value.
+  mutating func clearReferences() {self._references = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   enum FollowType: SwiftProtobuf.Enum, Swift.CaseIterable {
@@ -3482,6 +3641,8 @@ struct ProtoMyGuardianFollow: Sendable {
   }
 
   init() {}
+
+  fileprivate var _references: ProtoTagReferences? = nil
 }
 
 ///* Used for advert targeting. We should perhaps consider moving
@@ -3614,12 +3775,12 @@ struct ProtoAbTestInfo: Sendable {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  ///* the name of the experiment. It should be used to populate 
+  ///* the name of the experiment. It should be used to populate
   /// the name field of AbTest object in Ophan's event model.
   var name: String = String()
 
-  ///* the variant of the experiment this response is showing. 
-  /// It should be used to populate the variant name field of 
+  ///* the variant of the experiment this response is showing.
+  /// It should be used to populate the variant name field of
   /// AbTest object in Ophan's event model.
   var variant: String = String()
 
@@ -4028,6 +4189,27 @@ struct ProtoMatch: @unchecked Sendable {
   fileprivate var _storage = _StorageClass.defaultInstance
 }
 
+struct ProtoTagReferences: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var paFootballTeam: String {
+    get {return _paFootballTeam ?? String()}
+    set {_paFootballTeam = newValue}
+  }
+  /// Returns true if `paFootballTeam` has been explicitly set.
+  var hasPaFootballTeam: Bool {return self._paFootballTeam != nil}
+  /// Clears the value of `paFootballTeam`. Subsequent reads from it will return its default value.
+  mutating func clearPaFootballTeam() {self._paFootballTeam = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _paFootballTeam: String? = nil
+}
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 fileprivate let _protobuf_package = "com.gu.mobile.mapi.models.v0"
@@ -4060,6 +4242,10 @@ extension ProtoPuzzleSubType: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0PUZZLE_SUB_TYPE_UNSPECIFIED\0\u{1}PUZZLE_SUB_TYPE_QUICK_CROSSWORD\0\u{1}PUZZLE_SUB_TYPE_MINI_CROSSWORD\0\u{1}PUZZLE_SUB_TYPE_CRYPTIC_CROSSWORD\0\u{1}PUZZLE_SUB_TYPE_QUICK_CRYPTIC\0\u{1}PUZZLE_SUB_TYPE_WEEKEND_CROSSWORD\0\u{1}PUZZLE_SUB_TYPE_CROSSWORD_ARCHIVE\0\u{1}PUZZLE_SUB_TYPE_SUDOKU_EASY\0\u{1}PUZZLE_SUB_TYPE_SUDOKU_MEDIUM\0\u{1}PUZZLE_SUB_TYPE_SUDOKU_HARD\0\u{1}PUZZLE_SUB_TYPE_KILLER_SUDOKU\0")
 }
 
+extension ProtoPuzzleTypes: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0PUZZLE_TYPES_UNSPECIFIED\0\u{1}PUZZLE_TYPES_CROSSWORD_QUICK\0\u{1}PUZZLE_TYPES_CROSSWORD_MINI\0\u{1}PUZZLE_TYPES_CROSSWORD_CRYPTIC\0\u{1}PUZZLE_TYPES_CROSSWORD_QUICKCRYPTIC\0\u{1}PUZZLE_TYPES_CROSSWORD_WEEKEND\0\u{2}\u{2}PUZZLE_TYPES_SUDOKU_EASY\0\u{1}PUZZLE_TYPES_SUDOKU_MEDIUM\0\u{1}PUZZLE_TYPES_SUDOKU_HARD\0\u{1}PUZZLE_TYPES_SUDOKU_KILLER\0\u{1}PUZZLE_TYPES_CROSSWORD_PRIZE\0\u{1}PUZZLE_TYPES_CROSSWORD_QUIPTIC\0\u{1}PUZZLE_TYPES_CROSSWORD_SUNDAYQUICK\0\u{1}PUZZLE_TYPES_WORDWHEEL\0\u{1}PUZZLE_TYPES_WORDIPLY\0\u{1}PUZZLE_TYPES_ONTHEBALL\0\u{1}PUZZLE_TYPES_FILMREVEAL\0")
+}
+
 extension ProtoNavCardType: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0NAV_CARD_TYPE_UNSPECIFIED\0\u{1}NAV_CARD_TYPE_NEWS\0\u{1}NAV_CARD_TYPE_SPORT\0\u{1}NAV_CARD_TYPE_LIFESTYLE\0\u{1}NAV_CARD_TYPE_NARRATIVE\0")
 }
@@ -4078,7 +4264,7 @@ extension ProtoFontWeight: SwiftProtobuf._ProtoNameProviding {
 
 extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Collection"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}title\0\u{1}branding\0\u{3}premium_content\0\u{3}follow_up\0\u{1}hideable\0\u{3}myguardian_follow\0\u{1}description\0\u{1}image\0\u{1}design\0\u{3}compact_padding\0\u{3}tracking_id\0\u{3}small_heading\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}heading_style\0\u{3}display_title\0\u{3}last_updated_date\0\u{3}title_style\0\u{3}preferred_image_aspect_ratio\0\u{3}tighten_vertical_spacing\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}title\0\u{1}branding\0\u{3}premium_content\0\u{3}follow_up\0\u{1}hideable\0\u{3}myguardian_follow\0\u{1}description\0\u{1}image\0\u{1}design\0\u{3}compact_padding\0\u{3}tracking_id\0\u{3}small_heading\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}heading_style\0\u{3}display_title\0\u{3}last_updated_date\0\u{3}title_style\0\u{3}preferred_image_aspect_ratio\0\u{3}tighten_vertical_spacing\0\u{1}references\0")
 
   fileprivate class _StorageClass {
     var _id: String = String()
@@ -4105,6 +4291,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
     var _titleStyle: ProtoTitleStyle? = nil
     var _preferredImageAspectRatio: ProtoImageAspectRatio? = nil
     var _tightenVerticalSpacing: Bool? = nil
+    var _references: ProtoTagReferences? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -4139,6 +4326,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       _titleStyle = source._titleStyle
       _preferredImageAspectRatio = source._preferredImageAspectRatio
       _tightenVerticalSpacing = source._tightenVerticalSpacing
+      _references = source._references
     }
   }
 
@@ -4181,6 +4369,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
         case 22: try { try decoder.decodeSingularEnumField(value: &_storage._titleStyle) }()
         case 23: try { try decoder.decodeSingularEnumField(value: &_storage._preferredImageAspectRatio) }()
         case 24: try { try decoder.decodeSingularBoolField(value: &_storage._tightenVerticalSpacing) }()
+        case 25: try { try decoder.decodeSingularMessageField(value: &_storage._references) }()
         default: break
         }
       }
@@ -4265,6 +4454,9 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       try { if let v = _storage._tightenVerticalSpacing {
         try visitor.visitSingularBoolField(value: v, fieldNumber: 24)
       } }()
+      try { if let v = _storage._references {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 25)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -4298,6 +4490,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
         if _storage._titleStyle != rhs_storage._titleStyle {return false}
         if _storage._preferredImageAspectRatio != rhs_storage._preferredImageAspectRatio {return false}
         if _storage._tightenVerticalSpacing != rhs_storage._tightenVerticalSpacing {return false}
+        if _storage._references != rhs_storage._references {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -4719,7 +4912,7 @@ extension ProtoHeader: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementati
 
 extension ProtoLayoutAgnosticCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".LayoutAgnosticCollection"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}cards\0\u{1}title\0\u{3}follow_up\0\u{3}tracking_id\0\u{1}image\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}cards\0\u{1}title\0\u{3}follow_up\0\u{3}tracking_id\0\u{1}image\0\u{1}references\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -4735,6 +4928,7 @@ extension ProtoLayoutAgnosticCollection: SwiftProtobuf.Message, SwiftProtobuf._M
       case 6: try { try decoder.decodeSingularMessageField(value: &self._followUp) }()
       case 7: try { try decoder.decodeSingularStringField(value: &self._trackingID) }()
       case 8: try { try decoder.decodeSingularMessageField(value: &self._image) }()
+      case 9: try { try decoder.decodeSingularMessageField(value: &self._references) }()
       default: break
       }
     }
@@ -4769,6 +4963,9 @@ extension ProtoLayoutAgnosticCollection: SwiftProtobuf.Message, SwiftProtobuf._M
     try { if let v = self._image {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 8)
     } }()
+    try { if let v = self._references {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 9)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -4781,6 +4978,7 @@ extension ProtoLayoutAgnosticCollection: SwiftProtobuf.Message, SwiftProtobuf._M
     if lhs._followUp != rhs._followUp {return false}
     if lhs._trackingID != rhs._trackingID {return false}
     if lhs._image != rhs._image {return false}
+    if lhs._references != rhs._references {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -6095,53 +6293,125 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
 
 extension ProtoPuzzle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Puzzle"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{3}sub_type\0\u{1}uri\0\u{1}id\0\u{1}title\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\u{3}uri\0\u{1}id\0\u{1}title\0\u{3}palette_light\0\u{3}palette_dark\0\u{3}image_light\0\u{3}image_dark\0\u{3}puzzle_types\0\u{1}frequency\0\u{b}type\0\u{b}sub_type\0\u{c}\u{1}\u{1}\u{c}\u{2}\u{1}")
+
+  fileprivate class _StorageClass {
+    var _uri: String? = nil
+    var _id: String? = nil
+    var _title: String? = nil
+    var _paletteLight: ProtoPalette? = nil
+    var _paletteDark: ProtoPalette? = nil
+    var _imageLight: ProtoImage? = nil
+    var _imageDark: ProtoImage? = nil
+    var _puzzleTypes: ProtoPuzzleTypes = .unspecified
+    var _frequency: String? = nil
+
+      // This property is used as the initial default value for new instances of the type.
+      // The type itself is protecting the reference to its storage via CoW semantics.
+      // This will force a copy to be made of this reference when the first mutation occurs;
+      // hence, it is safe to mark this as `nonisolated(unsafe)`.
+      static nonisolated(unsafe) let defaultInstance = _StorageClass()
+
+    private init() {}
+
+    init(copying source: _StorageClass) {
+      _uri = source._uri
+      _id = source._id
+      _title = source._title
+      _paletteLight = source._paletteLight
+      _paletteDark = source._paletteDark
+      _imageLight = source._imageLight
+      _imageDark = source._imageDark
+      _puzzleTypes = source._puzzleTypes
+      _frequency = source._frequency
+    }
+  }
+
+  fileprivate mutating func _uniqueStorage() -> _StorageClass {
+    if !isKnownUniquelyReferenced(&_storage) {
+      _storage = _StorageClass(copying: _storage)
+    }
+    return _storage
+  }
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularEnumField(value: &self._type) }()
-      case 2: try { try decoder.decodeSingularEnumField(value: &self._subType) }()
-      case 3: try { try decoder.decodeSingularStringField(value: &self._uri) }()
-      case 4: try { try decoder.decodeSingularStringField(value: &self._id) }()
-      case 5: try { try decoder.decodeSingularStringField(value: &self._title) }()
-      default: break
+    _ = _uniqueStorage()
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      while let fieldNumber = try decoder.nextFieldNumber() {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every case branch when no optimizations are
+        // enabled. https://github.com/apple/swift-protobuf/issues/1034
+        switch fieldNumber {
+        case 3: try { try decoder.decodeSingularStringField(value: &_storage._uri) }()
+        case 4: try { try decoder.decodeSingularStringField(value: &_storage._id) }()
+        case 5: try { try decoder.decodeSingularStringField(value: &_storage._title) }()
+        case 6: try { try decoder.decodeSingularMessageField(value: &_storage._paletteLight) }()
+        case 7: try { try decoder.decodeSingularMessageField(value: &_storage._paletteDark) }()
+        case 8: try { try decoder.decodeSingularMessageField(value: &_storage._imageLight) }()
+        case 9: try { try decoder.decodeSingularMessageField(value: &_storage._imageDark) }()
+        case 10: try { try decoder.decodeSingularEnumField(value: &_storage._puzzleTypes) }()
+        case 11: try { try decoder.decodeSingularStringField(value: &_storage._frequency) }()
+        default: break
+        }
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    try { if let v = self._type {
-      try visitor.visitSingularEnumField(value: v, fieldNumber: 1)
-    } }()
-    try { if let v = self._subType {
-      try visitor.visitSingularEnumField(value: v, fieldNumber: 2)
-    } }()
-    try { if let v = self._uri {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 3)
-    } }()
-    try { if let v = self._id {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 4)
-    } }()
-    try { if let v = self._title {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 5)
-    } }()
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      try { if let v = _storage._uri {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 3)
+      } }()
+      try { if let v = _storage._id {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 4)
+      } }()
+      try { if let v = _storage._title {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 5)
+      } }()
+      try { if let v = _storage._paletteLight {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
+      } }()
+      try { if let v = _storage._paletteDark {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 7)
+      } }()
+      try { if let v = _storage._imageLight {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 8)
+      } }()
+      try { if let v = _storage._imageDark {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 9)
+      } }()
+      if _storage._puzzleTypes != .unspecified {
+        try visitor.visitSingularEnumField(value: _storage._puzzleTypes, fieldNumber: 10)
+      }
+      try { if let v = _storage._frequency {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 11)
+      } }()
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: ProtoPuzzle, rhs: ProtoPuzzle) -> Bool {
-    if lhs._type != rhs._type {return false}
-    if lhs._subType != rhs._subType {return false}
-    if lhs._uri != rhs._uri {return false}
-    if lhs._id != rhs._id {return false}
-    if lhs._title != rhs._title {return false}
+    if lhs._storage !== rhs._storage {
+      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
+        let _storage = _args.0
+        let rhs_storage = _args.1
+        if _storage._uri != rhs_storage._uri {return false}
+        if _storage._id != rhs_storage._id {return false}
+        if _storage._title != rhs_storage._title {return false}
+        if _storage._paletteLight != rhs_storage._paletteLight {return false}
+        if _storage._paletteDark != rhs_storage._paletteDark {return false}
+        if _storage._imageLight != rhs_storage._imageLight {return false}
+        if _storage._imageDark != rhs_storage._imageDark {return false}
+        if _storage._puzzleTypes != rhs_storage._puzzleTypes {return false}
+        if _storage._frequency != rhs_storage._frequency {return false}
+        return true
+      }
+      if !storagesAreEqual {return false}
+    }
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -6610,7 +6880,7 @@ extension ProtoTopic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
 
 extension ProtoMyGuardianFollow: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".MyGuardianFollow"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}web_title\0\u{1}type\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}web_title\0\u{1}type\0\u{1}references\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -6621,12 +6891,17 @@ extension ProtoMyGuardianFollow: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
       case 1: try { try decoder.decodeSingularStringField(value: &self.id) }()
       case 2: try { try decoder.decodeSingularStringField(value: &self.webTitle) }()
       case 3: try { try decoder.decodeSingularEnumField(value: &self.type) }()
+      case 4: try { try decoder.decodeSingularMessageField(value: &self._references) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.id.isEmpty {
       try visitor.visitSingularStringField(value: self.id, fieldNumber: 1)
     }
@@ -6636,6 +6911,9 @@ extension ProtoMyGuardianFollow: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     if self.type != .unspecified {
       try visitor.visitSingularEnumField(value: self.type, fieldNumber: 3)
     }
+    try { if let v = self._references {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -6643,6 +6921,7 @@ extension ProtoMyGuardianFollow: SwiftProtobuf.Message, SwiftProtobuf._MessageIm
     if lhs.id != rhs.id {return false}
     if lhs.webTitle != rhs.webTitle {return false}
     if lhs.type != rhs.type {return false}
+    if lhs._references != rhs._references {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -7367,6 +7646,40 @@ extension ProtoMatch: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementatio
       }
       if !storagesAreEqual {return false}
     }
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ProtoTagReferences: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".TagReferences"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}pa_football_team\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self._paFootballTeam) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._paFootballTeam {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 1)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoTagReferences, rhs: ProtoTagReferences) -> Bool {
+    if lhs._paFootballTeam != rhs._paFootballTeam {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
