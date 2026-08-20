@@ -640,9 +640,11 @@ message Puzzle {
   reserved "type";
   reserved 2;
   reserved "sub_type";
-  
+  /**
+   Puzzle URI
+   */
   optional string uri = 3;
-  optional string id = 4;
+  string id = 4;
   optional string title = 5;
   
   optional Palette palette_light = 6;

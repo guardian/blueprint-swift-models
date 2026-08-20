@@ -2276,22 +2276,40 @@ public struct BlueprintPuzzle: Hashable, Equatable, Sendable {
     // reserved "type";
     // reserved 2;
     // reserved "sub_type";
-    // optional string uri = 3;
-    // optional string id = 4;
-    // optional string title = 5;
-    // optional Palette palette_light = 6;
-    // optional Palette palette_dark = 7;
-    // optional Image image_light = 8;
-    // optional Image image_dark = 9;
-    // PuzzleTypes puzzle_types = 10;
+    // Puzzle URI
+    public let uri: URL?
+    public let id: String
+    public let title: String?
+    public let paletteLight: BlueprintPalette?
+    public let paletteDark: BlueprintPalette?
+    public let imageLight: BlueprintImage?
+    public let imageDark: BlueprintImage?
+    public let puzzleTypes: BlueprintPuzzleTypes
+
     // The frequency of the puzzle, e.g. "Daily", "Weekly", "Monthly".
     // This is used to display the frequency on the card.
     public let frequency: String?
     public private(set) var _backingData: Data?
 
     public init(
+         uri: URL?,
+         id: String,
+         title: String?,
+         paletteLight: BlueprintPalette?,
+         paletteDark: BlueprintPalette?,
+         imageLight: BlueprintImage?,
+         imageDark: BlueprintImage?,
+         puzzleTypes: BlueprintPuzzleTypes,
          frequency: String?
     ) {
+        self.uri = uri
+        self.id = id
+        self.title = title
+        self.paletteLight = paletteLight
+        self.paletteDark = paletteDark
+        self.imageLight = imageLight
+        self.imageDark = imageDark
+        self.puzzleTypes = puzzleTypes
         self.frequency = frequency
     }
 
@@ -2305,6 +2323,42 @@ public struct BlueprintPuzzle: Hashable, Equatable, Sendable {
     }
 
     internal init?(proto: ProtoPuzzle) {
+        if proto.hasUri {
+            self.uri = URL(string: proto.uri)
+        } else {
+            self.uri = nil
+        }
+        self.id = proto.id
+        if proto.hasTitle {
+            self.title = proto.title
+        } else {
+            self.title = nil
+        }
+        if proto.hasPaletteLight {
+            self.paletteLight = BlueprintPalette(proto: proto.paletteLight)
+        } else {
+            self.paletteLight = nil
+        }
+        if proto.hasPaletteDark {
+            self.paletteDark = BlueprintPalette(proto: proto.paletteDark)
+        } else {
+            self.paletteDark = nil
+        }
+        if proto.hasImageLight {
+            self.imageLight = BlueprintImage(proto: proto.imageLight)
+        } else {
+            self.imageLight = nil
+        }
+        if proto.hasImageDark {
+            self.imageDark = BlueprintImage(proto: proto.imageDark)
+        } else {
+            self.imageDark = nil
+        }
+        if let puzzleTypes = BlueprintPuzzleTypes(proto: proto.puzzleTypes) {
+            self.puzzleTypes = puzzleTypes
+        } else {
+            return nil
+        }
         if proto.hasFrequency {
             self.frequency = proto.frequency
         } else {
