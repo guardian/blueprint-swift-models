@@ -2575,6 +2575,8 @@ struct ProtoPuzzle: @unchecked Sendable {
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
+  ///*
+  ///Puzzle URI
   var uri: String {
     get {return _storage._uri ?? String()}
     set {_uniqueStorage()._uri = newValue}
@@ -2585,13 +2587,9 @@ struct ProtoPuzzle: @unchecked Sendable {
   mutating func clearUri() {_uniqueStorage()._uri = nil}
 
   var id: String {
-    get {return _storage._id ?? String()}
+    get {return _storage._id}
     set {_uniqueStorage()._id = newValue}
   }
-  /// Returns true if `id` has been explicitly set.
-  var hasID: Bool {return _storage._id != nil}
-  /// Clears the value of `id`. Subsequent reads from it will return its default value.
-  mutating func clearID() {_uniqueStorage()._id = nil}
 
   var title: String {
     get {return _storage._title ?? String()}
@@ -6297,7 +6295,7 @@ extension ProtoPuzzle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementati
 
   fileprivate class _StorageClass {
     var _uri: String? = nil
-    var _id: String? = nil
+    var _id: String = String()
     var _title: String? = nil
     var _paletteLight: ProtoPalette? = nil
     var _paletteDark: ProtoPalette? = nil
@@ -6366,9 +6364,9 @@ extension ProtoPuzzle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementati
       try { if let v = _storage._uri {
         try visitor.visitSingularStringField(value: v, fieldNumber: 3)
       } }()
-      try { if let v = _storage._id {
-        try visitor.visitSingularStringField(value: v, fieldNumber: 4)
-      } }()
+      if !_storage._id.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._id, fieldNumber: 4)
+      }
       try { if let v = _storage._title {
         try visitor.visitSingularStringField(value: v, fieldNumber: 5)
       } }()
