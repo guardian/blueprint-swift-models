@@ -4,16 +4,12 @@ name: Sync blueprint.proto
 # it produces) in sync with the version of the file living in
 # guardian/mobile-apps-api-models.
 #
-# Triggered instantly via a repository_dispatch sent from a workflow in
-# mobile-apps-api-models whenever proto/blueprint.proto changes on its main
-# branch. A weekly schedule is kept as a safety net in case a dispatch is
-# ever missed, and workflow_dispatch allows a manual run.
+# Polls the upstream file once a day and only runs the (slow) regeneration
+# step when it has actually changed. workflow_dispatch allows a manual run.
 on:
-  repository_dispatch:
-    types: [blueprint-proto-updated]
   schedule:
-    # Every Monday at 6am UTC - safety net in case a dispatch is missed.
-    - cron: '0 6 * * 1'
+    # Every day at 6am UTC.
+    - cron: '0 6 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -95,8 +91,6 @@ jobs:
             Swift models via `Scripts/update-blueprint-models.sh`.
 
             Please review the generated diff before merging.
-
-            ${{ github.event.client_payload.sha && format('Triggered by https://github.com/{0}/commit/{1}', env.UPSTREAM_REPO, github.event.client_payload.sha) || '' }}
 
             ---
             *Created by the [Sync blueprint.proto workflow](https://github.com/${{ github.repository }}/actions/workflows/sync-blueprint-proto.yml)*
