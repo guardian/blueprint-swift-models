@@ -594,7 +594,13 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
     // boost level to indicate the card size.
     public let compact: Bool
     public let sublinks: [BlueprintArticle]
+
+    // HTML string containing a blob of HTML to render if an unknown card type or
+    // error rendering.
     public let htmlFallback: String?
+
+    // URL of web content to show if unknown card type or error rendering.
+    public let uriFallback: String?
 
     // Individual cards can be branded and not be part of a branded container.
     // Cards that are branded tend to show the sponsor logo and should be
@@ -688,6 +694,7 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
          compact: Bool,
          sublinks: [BlueprintArticle],
          htmlFallback: String?,
+         uriFallback: String?,
          branding: BlueprintBranding?,
          premiumContent: Bool,
          sublinksPaletteLight: BlueprintPalette?,
@@ -717,6 +724,7 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
         self.compact = compact
         self.sublinks = sublinks
         self.htmlFallback = htmlFallback
+        self.uriFallback = uriFallback
         self.branding = branding
         self.premiumContent = premiumContent
         self.sublinksPaletteLight = sublinksPaletteLight
@@ -776,6 +784,11 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
             self.htmlFallback = proto.htmlFallback
         } else {
             self.htmlFallback = nil
+        }
+        if proto.hasUriFallback {
+            self.uriFallback = proto.uriFallback
+        } else {
+            self.uriFallback = nil
         }
         if proto.hasBranding {
             self.branding = BlueprintBranding(proto: proto.branding)

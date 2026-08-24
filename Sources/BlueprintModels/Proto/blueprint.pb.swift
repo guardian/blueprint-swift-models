@@ -2715,6 +2715,9 @@ struct ProtoCard: @unchecked Sendable {
     set {_uniqueStorage()._sublinks = newValue}
   }
 
+  ///*
+  /// HTML string containing a blob of HTML to render if an unknown card type or
+  /// error rendering.
   var htmlFallback: String {
     get {return _storage._htmlFallback ?? String()}
     set {_uniqueStorage()._htmlFallback = newValue}
@@ -2723,6 +2726,17 @@ struct ProtoCard: @unchecked Sendable {
   var hasHtmlFallback: Bool {return _storage._htmlFallback != nil}
   /// Clears the value of `htmlFallback`. Subsequent reads from it will return its default value.
   mutating func clearHtmlFallback() {_uniqueStorage()._htmlFallback = nil}
+
+  ///*
+  /// URL of web content to show if unknown card type or error rendering.
+  var uriFallback: String {
+    get {return _storage._uriFallback ?? String()}
+    set {_uniqueStorage()._uriFallback = newValue}
+  }
+  /// Returns true if `uriFallback` has been explicitly set.
+  var hasUriFallback: Bool {return _storage._uriFallback != nil}
+  /// Clears the value of `uriFallback`. Subsequent reads from it will return its default value.
+  mutating func clearUriFallback() {_uniqueStorage()._uriFallback = nil}
 
   ///*
   /// Individual cards can be branded and not be part of a branded container.
@@ -6417,7 +6431,7 @@ extension ProtoPuzzle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementati
 
 extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Card"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}article\0\u{1}boosted\0\u{1}compact\0\u{1}sublinks\0\u{3}html_fallback\0\u{1}branding\0\u{3}premium_content\0\u{3}sublinks_palette_light\0\u{3}sublinks_palette_dark\0\u{3}card_number\0\u{3}podcast_series\0\u{4}\u{19}corresponding_tags\0\u{3}mega_boosted\0\u{3}trail_image_size\0\u{4}\u{2}sublinks_arrangement\0\u{3}boosted_headline\0\u{3}headline_position\0\u{3}card_size\0\u{3}boost_level\0\u{3}preferred_sublinks_arrangement\0\u{3}top_border_style\0\u{3}headline_weight\0\u{3}nav_card_type\0\u{3}should_hide_image\0\u{3}condensed_palette_light\0\u{3}condensed_palette_dark\0\u{1}puzzle\0\u{b}trail_image_aspect_ratio\0\u{c}(\u{1}")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}article\0\u{1}boosted\0\u{1}compact\0\u{1}sublinks\0\u{3}html_fallback\0\u{1}branding\0\u{3}premium_content\0\u{3}sublinks_palette_light\0\u{3}sublinks_palette_dark\0\u{3}card_number\0\u{3}podcast_series\0\u{3}uri_fallback\0\u{4}\u{18}corresponding_tags\0\u{3}mega_boosted\0\u{3}trail_image_size\0\u{4}\u{2}sublinks_arrangement\0\u{3}boosted_headline\0\u{3}headline_position\0\u{3}card_size\0\u{3}boost_level\0\u{3}preferred_sublinks_arrangement\0\u{3}top_border_style\0\u{3}headline_weight\0\u{3}nav_card_type\0\u{3}should_hide_image\0\u{3}condensed_palette_light\0\u{3}condensed_palette_dark\0\u{1}puzzle\0\u{b}trail_image_aspect_ratio\0\u{c}(\u{1}")
 
   fileprivate class _StorageClass {
     var _type: ProtoCard.CardType = .unspecified
@@ -6426,6 +6440,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
     var _compact: Bool? = nil
     var _sublinks: [ProtoArticle] = []
     var _htmlFallback: String? = nil
+    var _uriFallback: String? = nil
     var _branding: ProtoBranding? = nil
     var _premiumContent: Bool? = nil
     var _sublinksPaletteLight: ProtoPalette? = nil
@@ -6464,6 +6479,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
       _compact = source._compact
       _sublinks = source._sublinks
       _htmlFallback = source._htmlFallback
+      _uriFallback = source._uriFallback
       _branding = source._branding
       _premiumContent = source._premiumContent
       _sublinksPaletteLight = source._sublinksPaletteLight
@@ -6516,6 +6532,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
         case 10: try { try decoder.decodeSingularMessageField(value: &_storage._sublinksPaletteDark) }()
         case 11: try { try decoder.decodeSingularInt32Field(value: &_storage._cardNumber) }()
         case 12: try { try decoder.decodeSingularMessageField(value: &_storage._podcastSeries) }()
+        case 13: try { try decoder.decodeSingularStringField(value: &_storage._uriFallback) }()
         case 37: try { try decoder.decodeRepeatedMessageField(value: &_storage._correspondingTags) }()
         case 38: try { try decoder.decodeSingularBoolField(value: &_storage._megaBoosted) }()
         case 39: try { try decoder.decodeSingularInt32Field(value: &_storage._trailImageSize) }()
@@ -6580,6 +6597,9 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
       try { if let v = _storage._podcastSeries {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 12)
       } }()
+      try { if let v = _storage._uriFallback {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 13)
+      } }()
       if !_storage._correspondingTags.isEmpty {
         try visitor.visitRepeatedMessageField(value: _storage._correspondingTags, fieldNumber: 37)
       }
@@ -6643,6 +6663,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
         if _storage._compact != rhs_storage._compact {return false}
         if _storage._sublinks != rhs_storage._sublinks {return false}
         if _storage._htmlFallback != rhs_storage._htmlFallback {return false}
+        if _storage._uriFallback != rhs_storage._uriFallback {return false}
         if _storage._branding != rhs_storage._branding {return false}
         if _storage._premiumContent != rhs_storage._premiumContent {return false}
         if _storage._sublinksPaletteLight != rhs_storage._sublinksPaletteLight {return false}
