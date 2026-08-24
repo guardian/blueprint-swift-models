@@ -11,6 +11,13 @@ on:
     # Every day at 6am UTC.
     - cron: '0 6 * * *'
   workflow_dispatch: {}
+  # TEMPORARY: lets us test this workflow on the PR before merging to main
+  # (workflow_dispatch can't be used until the file exists on main). Remove
+  # before merging.
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/sync-blueprint-proto.yml'
 
 permissions:
   contents: write
@@ -27,6 +34,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # TEMPORARY: ensures we check out the PR's head branch (rather than
+          # the merge commit) so create-pull-request has a real branch to
+          # push from during testing. Remove along with the pull_request
+          # trigger above.
+          ref: ${{ github.head_ref || github.ref }}
 
       - name: Fetch latest blueprint.proto
         run: |
