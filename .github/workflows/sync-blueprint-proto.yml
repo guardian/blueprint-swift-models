@@ -21,6 +21,10 @@ env:
   UPSTREAM_PATH: proto/blueprint.proto
   LOCAL_PROTO: Sources/BlueprintModels/Proto/blueprint.proto
 
+concurrency:
+  group: sync-blueprint-proto
+  cancel-in-progress: true
+
 jobs:
   sync:
     runs-on: macos-latest
