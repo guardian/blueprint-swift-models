@@ -30,7 +30,7 @@ jobs:
 
       - name: Fetch latest blueprint.proto
         run: |
-          curl -sSL --fail -o /tmp/blueprint.proto \
+          curl -sSL --fail --retry 3 --retry-delay 2 --retry-connrefused -o /tmp/blueprint.proto \
             "https://raw.githubusercontent.com/${UPSTREAM_REPO}/main/${UPSTREAM_PATH}"
 
       - name: Check for changes
