@@ -1,0 +1,100 @@
+name: Sync blueprint.proto
+
+# Keeps Sources/BlueprintModels/Proto/blueprint.proto (and the generated Swift
+# it produces) in sync with the version of the file living in
+# guardian/mobile-apps-api-models.
+#
+# Polls the upstream file once a day and only runs the (slow) regeneration
+# step when it has actually changed. workflow_dispatch allows a manual run.
+on:
+  schedule:
+    # Every day at 6am UTC.
+    - cron: '0 6 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  UPSTREAM_REPO: guardian/mobile-apps-api-models
+  UPSTREAM_PATH: proto/blueprint.proto
+  LOCAL_PROTO: Sources/BlueprintModels/Proto/blueprint.proto
+
+concurrency:
+  group: sync-blueprint-proto
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch latest blueprint.proto
+        run: |
+          curl -sSL --fail --retry 3 --retry-delay 2 --retry-connrefused -o /tmp/blueprint.proto \
+            "https://raw.githubusercontent.com/${UPSTREAM_REPO}/main/${UPSTREAM_PATH}"
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if diff -q /tmp/blueprint.proto "${LOCAL_PROTO}" > /dev/null 2>&1; then
+            echo "No changes to blueprint.proto"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "blueprint.proto has changed upstream"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update proto file and remove stale generated files
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          cp /tmp/blueprint.proto "${LOCAL_PROTO}"
+          rm -f Sources/BlueprintModels/Proto/blueprint.desc \
+                Sources/BlueprintModels/Proto/blueprint.swift \
+                Sources/BlueprintModels/Proto/blueprint.pb.swift
+
+      - name: Install protoc and mint
+        if: steps.diff.outputs.changed == 'true'
+        run: brew install protobuf mint
+
+      - name: Cache protoc-gen-swift build
+        if: steps.diff.outputs.changed == 'true'
+        uses: actions/cache@v4
+        with:
+          path: ~/.swift-protobuf-cache
+          key: protoc-gen-swift-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
+
+      - name: Regenerate Swift models
+        if: steps.diff.outputs.changed == 'true'
+        working-directory: Scripts
+        run: ./update-blueprint-models.sh
+
+      - name: Create Pull Request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: |
+            Update blueprint.proto and regenerate Swift models
+
+            Synced from ${{ env.UPSTREAM_REPO }}@main
+          branch: automated/update-blueprint-proto
+          delete-branch: true
+          title: 'Update blueprint.proto and regenerate Swift models'
+          body: |
+            ## Automated blueprint.proto sync
+
+            This PR was automatically generated because `${{ env.UPSTREAM_PATH }}`
+            changed on the `main` branch of
+            [${{ env.UPSTREAM_REPO }}](https://github.com/${{ env.UPSTREAM_REPO }}/blob/main/${{ env.UPSTREAM_PATH }}).
+
+            It updates the local copy of `blueprint.proto` and regenerates the
+            Swift models via `Scripts/update-blueprint-models.sh`.
+
+            Please review the generated diff before merging.
+
+            ---
+            *Created by the [Sync blueprint.proto workflow](https://github.com/${{ github.repository }}/actions/workflows/sync-blueprint-proto.yml)*
