@@ -327,7 +327,7 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
         } else {
             self.webContentUri = nil
         }
-        if let tracking = BlueprintTracking(proto: proto.tracking) {
+        if let tracking = BlueprintTracking(proto: proto.tracking) as BlueprintTracking? {
             self.tracking = tracking
         } else {
             return nil
@@ -342,7 +342,7 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
         } else {
             self.podcastSeries = nil
         }
-        if let adTargetingParams = BlueprintAdTargetingParams(proto: proto.adTargetingParams) {
+        if let adTargetingParams = BlueprintAdTargetingParams(proto: proto.adTargetingParams) as BlueprintAdTargetingParams? {
             self.adTargetingParams = adTargetingParams
         } else {
             return nil
@@ -594,7 +594,13 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
     // boost level to indicate the card size.
     public let compact: Bool
     public let sublinks: [BlueprintArticle]
+
+    // HTML string containing a blob of HTML to render if an unknown card type or
+    // error rendering.
     public let htmlFallback: String?
+
+    // URL of web content to show if unknown card type or error rendering.
+    public let uriFallback: String?
 
     // Individual cards can be branded and not be part of a branded container.
     // Cards that are branded tend to show the sponsor logo and should be
@@ -688,6 +694,7 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
          compact: Bool,
          sublinks: [BlueprintArticle],
          htmlFallback: String?,
+         uriFallback: String?,
          branding: BlueprintBranding?,
          premiumContent: Bool,
          sublinksPaletteLight: BlueprintPalette?,
@@ -717,6 +724,7 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
         self.compact = compact
         self.sublinks = sublinks
         self.htmlFallback = htmlFallback
+        self.uriFallback = uriFallback
         self.branding = branding
         self.premiumContent = premiumContent
         self.sublinksPaletteLight = sublinksPaletteLight
@@ -751,7 +759,7 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
     }
 
     internal init?(proto: ProtoCard) {
-        if let type = BlueprintCardType(proto: proto.type) {
+        if let type = BlueprintCardType(proto: proto.type) as BlueprintCardType? {
             self.type = type
         } else {
             return nil
@@ -776,6 +784,11 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
             self.htmlFallback = proto.htmlFallback
         } else {
             self.htmlFallback = nil
+        }
+        if proto.hasUriFallback {
+            self.uriFallback = proto.uriFallback
+        } else {
+            self.uriFallback = nil
         }
         if proto.hasBranding {
             self.branding = BlueprintBranding(proto: proto.branding)
@@ -1302,7 +1315,7 @@ public struct BlueprintFollowUp: Hashable, Equatable, Sendable {
     }
 
     internal init?(proto: ProtoFollowUp) {
-        if let type = BlueprintFollowUpType(proto: proto.type) {
+        if let type = BlueprintFollowUpType(proto: proto.type) as BlueprintFollowUpType? {
             self.type = type
         } else {
             return nil
@@ -1367,7 +1380,7 @@ public struct BlueprintHeader: Hashable, Equatable, Sendable {
         } else {
             self.description = nil
         }
-        if let alignment = BlueprintHeaderType(proto: proto.alignment) {
+        if let alignment = BlueprintHeaderType(proto: proto.alignment) as BlueprintHeaderType? {
             self.alignment = alignment
         } else {
             return nil
@@ -1728,7 +1741,7 @@ public struct BlueprintList: Hashable, Equatable, Sendable {
         } else {
             self.previousPageURL = nil
         }
-        if let tracking = BlueprintTracking(proto: proto.tracking) {
+        if let tracking = BlueprintTracking(proto: proto.tracking) as BlueprintTracking? {
             self.tracking = tracking
         } else {
             return nil
@@ -1745,7 +1758,7 @@ public struct BlueprintList: Hashable, Equatable, Sendable {
         } else {
             self.webUri = nil
         }
-        if let adTargetingParams = BlueprintAdTargetingParams(proto: proto.adTargetingParams) {
+        if let adTargetingParams = BlueprintAdTargetingParams(proto: proto.adTargetingParams) as BlueprintAdTargetingParams? {
             self.adTargetingParams = adTargetingParams
         } else {
             return nil
@@ -1897,12 +1910,12 @@ public struct BlueprintMatch: Hashable, Equatable, Sendable {
 
     internal init?(proto: ProtoMatch) {
         self.id = proto.id
-        if let homeTeam = BlueprintTeam(proto: proto.homeTeam) {
+        if let homeTeam = BlueprintTeam(proto: proto.homeTeam) as BlueprintTeam? {
             self.homeTeam = homeTeam
         } else {
             return nil
         }
-        if let awayTeam = BlueprintTeam(proto: proto.awayTeam) {
+        if let awayTeam = BlueprintTeam(proto: proto.awayTeam) as BlueprintTeam? {
             self.awayTeam = awayTeam
         } else {
             return nil
@@ -2027,7 +2040,7 @@ public struct BlueprintMyGuardianFollow: Hashable, Equatable, Sendable {
     internal init?(proto: ProtoMyGuardianFollow) {
         self.id = proto.id
         self.webTitle = proto.webTitle
-        if let type = BlueprintFollowType(proto: proto.type) {
+        if let type = BlueprintFollowType(proto: proto.type) as BlueprintFollowType? {
             self.type = type
         } else {
             return nil
@@ -2354,7 +2367,7 @@ public struct BlueprintPuzzle: Hashable, Equatable, Sendable {
         } else {
             self.imageDark = nil
         }
-        if let puzzleTypes = BlueprintPuzzleTypes(proto: proto.puzzleTypes) {
+        if let puzzleTypes = BlueprintPuzzleTypes(proto: proto.puzzleTypes) as BlueprintPuzzleTypes? {
             self.puzzleTypes = puzzleTypes
         } else {
             return nil
@@ -2488,7 +2501,7 @@ public struct BlueprintRow: Hashable, Equatable, Sendable {
         } else {
             self.thrasher = nil
         }
-        if let type = BlueprintRowType(proto: proto.type) {
+        if let type = BlueprintRowType(proto: proto.type) as BlueprintRowType? {
             self.type = type
         } else {
             return nil
@@ -2685,7 +2698,7 @@ public struct BlueprintTablePosition: Hashable, Equatable, Sendable {
     }
 
     internal init?(proto: ProtoTablePosition) {
-        if let team = BlueprintTeam(proto: proto.team) {
+        if let team = BlueprintTeam(proto: proto.team) as BlueprintTeam? {
             self.team = team
         } else {
             return nil
@@ -2777,7 +2790,7 @@ public struct BlueprintTeam: Hashable, Equatable, Sendable {
         self.id = proto.id
         self.name = proto.name
         self.shortCode = proto.shortCode
-        if let crest = BlueprintImage(proto: proto.crest) {
+        if let crest = BlueprintImage(proto: proto.crest) as BlueprintImage? {
             self.crest = crest
         } else {
             return nil
@@ -2882,7 +2895,7 @@ public struct BlueprintTracking: Hashable, Equatable, Sendable {
     }
 
     internal init?(proto: ProtoTracking) {
-        if let permutive = BlueprintPermutive(proto: proto.permutive) {
+        if let permutive = BlueprintPermutive(proto: proto.permutive) as BlueprintPermutive? {
             self.permutive = permutive
         } else {
             return nil
@@ -3068,7 +3081,7 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
         self.isInteractive = proto.isInteractive
         self.showProgressBar = proto.showProgressBar
         self.showSubtitles = proto.showSubtitles
-        if let overlayPosition = BlueprintVideoOverlayPosition(proto: proto.overlayPosition) {
+        if let overlayPosition = BlueprintVideoOverlayPosition(proto: proto.overlayPosition) as BlueprintVideoOverlayPosition? {
             self.overlayPosition = overlayPosition
         } else {
             return nil
@@ -3078,7 +3091,7 @@ public struct BlueprintVideo: Hashable, Equatable, Sendable {
         self.allowFullscreen = proto.allowFullscreen
         self.showTimestamp = proto.showTimestamp
         self.allowSharing = proto.allowSharing
-        if let tracking = BlueprintEventTracking(proto: proto.tracking) {
+        if let tracking = BlueprintEventTracking(proto: proto.tracking) as BlueprintEventTracking? {
             self.tracking = tracking
         } else {
             return nil
@@ -3101,9 +3114,14 @@ extension BlueprintCard {
         case boosted2 = 3
         case boosted3 = 4
         case boosted4 = 5
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoCard.BoostedHeadline) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoCard.BoostedHeadline) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3120,9 +3138,14 @@ extension BlueprintCard {
         case xLarge = 7
         case highlights = 8
         case xLargeHorizontal = 9
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoCard.CardSize) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoCard.CardSize) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3143,9 +3166,14 @@ extension BlueprintCard {
         case navigation = 11
         case gallery = 12
         case puzzle = 13
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoCard.CardType) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoCard.CardType) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3156,9 +3184,14 @@ extension BlueprintCollection {
         case regular = 1
         case podcast = 2
         case titlepiece = 3
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoCollection.CollectionDesign) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoCollection.CollectionDesign) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3179,9 +3212,14 @@ extension BlueprintMyGuardianFollow {
         case paidContent = 11
         case campaign = 12
         case type = 13
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoMyGuardianFollow.FollowType) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoMyGuardianFollow.FollowType) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3192,9 +3230,14 @@ extension BlueprintFollowUp {
         case list = 1
         case front = 2
         case inapp = 3
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoFollowUp.FollowUpType) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoFollowUp.FollowUpType) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3203,9 +3246,14 @@ public enum BlueprintFontWeight: Int, CaseIterable, Hashable, Equatable, Sendabl
     case unspecified = 0
     case standard = 1
     case light = 2
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoFontWeight) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoFontWeight) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3215,9 +3263,14 @@ extension BlueprintTablePosition {
         case win = 1
         case draw = 2
         case loss = 3
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoTablePosition.Form) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoTablePosition.Form) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3226,9 +3279,14 @@ public enum BlueprintHeaderType: Int, CaseIterable, Hashable, Equatable, Sendabl
     case unspecified = 0
     case centre = 1
     case leading = 2
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoHeaderType) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoHeaderType) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3238,9 +3296,14 @@ extension BlueprintCollection {
         case hidden = 1
         case regular = 2
         case small = 3
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoCollection.HeadingStyle) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoCollection.HeadingStyle) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3250,9 +3313,14 @@ extension BlueprintCard {
         case unspecified = 0
         case inline = 1
         case top = 2
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoCard.HeadlinePosition) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoCard.HeadlinePosition) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3263,9 +3331,14 @@ public enum BlueprintImageAspectRatio: Int, CaseIterable, Hashable, Equatable, S
     case landscape54 = 2
     case portrait45 = 3
     case square = 4
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoImageAspectRatio) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoImageAspectRatio) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3274,9 +3347,14 @@ public enum BlueprintMediaType: Int, CaseIterable, Hashable, Equatable, Sendable
     case video = 1
     case audio = 2
     case image = 3
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoMediaType) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoMediaType) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3286,9 +3364,14 @@ public enum BlueprintNavCardType: Int, CaseIterable, Hashable, Equatable, Sendab
     case sport = 2
     case lifestyle = 3
     case narrative = 4
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoNavCardType) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoNavCardType) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3296,9 +3379,14 @@ public enum BlueprintPlatform: Int, CaseIterable, Hashable, Equatable, Sendable 
     case unspecified = 0
     case youtube = 1
     case url = 2
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoPlatform) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoPlatform) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3314,9 +3402,14 @@ public enum BlueprintPuzzleSubType: Int, CaseIterable, Hashable, Equatable, Send
     case sudokuMedium = 8
     case sudokuHard = 9
     case killerSudoku = 10
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoPuzzleSubType) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoPuzzleSubType) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3328,9 +3421,14 @@ public enum BlueprintPuzzleType: Int, CaseIterable, Hashable, Equatable, Sendabl
     case wordiply = 4
     case onTheBall = 5
     case filmReveal = 6
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoPuzzleType) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoPuzzleType) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3352,9 +3450,14 @@ public enum BlueprintPuzzleTypes: Int, CaseIterable, Hashable, Equatable, Sendab
     case wordiply = 15
     case ontheball = 16
     case filmreveal = 17
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoPuzzleTypes) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoPuzzleTypes) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3365,9 +3468,14 @@ extension BlueprintRow {
         case carousel = 2
         case webContent = 3
         case programmaticCarousel = 4
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoRow.RowType) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoRow.RowType) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3377,9 +3485,14 @@ extension BlueprintCard {
         case unspecified = 0
         case vertical = 1
         case horizontal = 2
+        case unrecognized = 9999
 
-        internal init?(proto: ProtoCard.SublinksArrangement) {
-            self.init(rawValue: proto.rawValue)
+        internal init(proto: ProtoCard.SublinksArrangement) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
@@ -3389,9 +3502,14 @@ public enum BlueprintTitleStyle: Int, CaseIterable, Hashable, Equatable, Sendabl
     case hidden = 1
     case regular = 2
     case small = 3
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoTitleStyle) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoTitleStyle) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3399,9 +3517,14 @@ public enum BlueprintTopBorderStyle: Int, CaseIterable, Hashable, Equatable, Sen
     case unspecified = 0
     case hidden = 1
     case regular = 2
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoTopBorderStyle) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoTopBorderStyle) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
@@ -3409,9 +3532,14 @@ public enum BlueprintVideoOverlayPosition: Int, CaseIterable, Hashable, Equatabl
     case unspecified = 0
     case bottom = 1
     case top = 2
+    case unrecognized = 9999
 
-    internal init?(proto: ProtoVideoOverlayPosition) {
-        self.init(rawValue: proto.rawValue)
+    internal init(proto: ProtoVideoOverlayPosition) {
+        if let value = Self(rawValue: proto.rawValue) {
+            self = value
+        } else {
+            self = .unrecognized
+        }
     }
 }
 
