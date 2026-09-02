@@ -1,5 +1,5 @@
 {
-  "originHash" : "adacb80fb99363d86f4ffe4d93038a46bba341317ca2287c6ae116aa537bea1d",
+  "originHash" : "59eaee1feb1c8f4730b58d0a40346355063d1f515c16637297c6be38a2f388e0",
   "pins" : [
     {
       "identity" : "swift-argument-parser",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/guardian/swift-buffet.git",
       "state" : {
-        "revision" : "4ab14da937c1486391f33c9d3159678886c50957",
-        "version" : "1.0.7"
+        "revision" : "cbebb4e97245f6e85c9461538ba8d332e48b3658",
+        "version" : "1.1.0"
       }
     },
     {
