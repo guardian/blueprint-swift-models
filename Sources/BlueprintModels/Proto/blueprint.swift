@@ -984,6 +984,12 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
     public let preferredImageAspectRatio: BlueprintImageAspectRatio?
     public let tightenVerticalSpacing: Bool
     public let references: BlueprintTagReferences?
+
+    // Ordered list of puzzle types that are available in this collection. This
+    // is used to display the puzzle types in the archive menu for this
+    // collection.
+    // If this list is empty, the archive link should not be displayed.
+    public let puzzleArchiveTypes: [BlueprintPuzzleTypes]
     public private(set) var _backingData: Data?
 
     public init(
@@ -1011,7 +1017,8 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
          titleStyle: BlueprintTitleStyle?,
          preferredImageAspectRatio: BlueprintImageAspectRatio?,
          tightenVerticalSpacing: Bool,
-         references: BlueprintTagReferences?
+         references: BlueprintTagReferences?,
+         puzzleArchiveTypes: [BlueprintPuzzleTypes]
     ) {
         self.id = id
         self.paletteLight = paletteLight
@@ -1038,6 +1045,7 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
         self.preferredImageAspectRatio = preferredImageAspectRatio
         self.tightenVerticalSpacing = tightenVerticalSpacing
         self.references = references
+        self.puzzleArchiveTypes = puzzleArchiveTypes
     }
 
     public init?(data: Data) {
@@ -1163,6 +1171,7 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
         } else {
             self.references = nil
         }
+        self.puzzleArchiveTypes = proto.puzzleArchiveTypes.compactMap { BlueprintPuzzleTypes(proto: $0) }
     }
 }
 
