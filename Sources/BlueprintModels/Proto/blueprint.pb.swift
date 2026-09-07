@@ -889,6 +889,16 @@ struct ProtoCollection: @unchecked Sendable {
   /// Clears the value of `references`. Subsequent reads from it will return its default value.
   mutating func clearReferences() {_uniqueStorage()._references = nil}
 
+  ///*
+  /// Ordered list of puzzle types that are available in this collection. This
+  /// is used to display the puzzle types in the archive menu for this
+  /// collection.
+  /// If this list is empty, the archive link should not be displayed.
+  var puzzleArchiveTypes: [ProtoPuzzleTypes] {
+    get {return _storage._puzzleArchiveTypes}
+    set {_uniqueStorage()._puzzleArchiveTypes = newValue}
+  }
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   ///*
@@ -3034,6 +3044,10 @@ struct ProtoCard: @unchecked Sendable {
     ///*
     /// A card for a puzzle item.
     case puzzle // = 13
+
+    ///*
+    /// A card for a election results tracker.
+    case election // = 14
     case UNRECOGNIZED(Int)
 
     init() {
@@ -3056,6 +3070,7 @@ struct ProtoCard: @unchecked Sendable {
       case 11: self = .navigation
       case 12: self = .gallery
       case 13: self = .puzzle
+      case 14: self = .election
       default: self = .UNRECOGNIZED(rawValue)
       }
     }
@@ -3076,6 +3091,7 @@ struct ProtoCard: @unchecked Sendable {
       case .navigation: return 11
       case .gallery: return 12
       case .puzzle: return 13
+      case .election: return 14
       case .UNRECOGNIZED(let i): return i
       }
     }
@@ -3096,6 +3112,7 @@ struct ProtoCard: @unchecked Sendable {
       .navigation,
       .gallery,
       .puzzle,
+      .election,
     ]
 
   }
@@ -4276,7 +4293,7 @@ extension ProtoFontWeight: SwiftProtobuf._ProtoNameProviding {
 
 extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Collection"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}title\0\u{1}branding\0\u{3}premium_content\0\u{3}follow_up\0\u{1}hideable\0\u{3}myguardian_follow\0\u{1}description\0\u{1}image\0\u{1}design\0\u{3}compact_padding\0\u{3}tracking_id\0\u{3}small_heading\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}heading_style\0\u{3}display_title\0\u{3}last_updated_date\0\u{3}title_style\0\u{3}preferred_image_aspect_ratio\0\u{3}tighten_vertical_spacing\0\u{1}references\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}title\0\u{1}branding\0\u{3}premium_content\0\u{3}follow_up\0\u{1}hideable\0\u{3}myguardian_follow\0\u{1}description\0\u{1}image\0\u{1}design\0\u{3}compact_padding\0\u{3}tracking_id\0\u{3}small_heading\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}heading_style\0\u{3}display_title\0\u{3}last_updated_date\0\u{3}title_style\0\u{3}preferred_image_aspect_ratio\0\u{3}tighten_vertical_spacing\0\u{1}references\0\u{3}puzzle_archive_types\0")
 
   fileprivate class _StorageClass {
     var _id: String = String()
@@ -4304,6 +4321,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
     var _preferredImageAspectRatio: ProtoImageAspectRatio? = nil
     var _tightenVerticalSpacing: Bool? = nil
     var _references: ProtoTagReferences? = nil
+    var _puzzleArchiveTypes: [ProtoPuzzleTypes] = []
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -4339,6 +4357,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       _preferredImageAspectRatio = source._preferredImageAspectRatio
       _tightenVerticalSpacing = source._tightenVerticalSpacing
       _references = source._references
+      _puzzleArchiveTypes = source._puzzleArchiveTypes
     }
   }
 
@@ -4382,6 +4401,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
         case 23: try { try decoder.decodeSingularEnumField(value: &_storage._preferredImageAspectRatio) }()
         case 24: try { try decoder.decodeSingularBoolField(value: &_storage._tightenVerticalSpacing) }()
         case 25: try { try decoder.decodeSingularMessageField(value: &_storage._references) }()
+        case 26: try { try decoder.decodeRepeatedEnumField(value: &_storage._puzzleArchiveTypes) }()
         default: break
         }
       }
@@ -4469,6 +4489,9 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       try { if let v = _storage._references {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 25)
       } }()
+      if !_storage._puzzleArchiveTypes.isEmpty {
+        try visitor.visitPackedEnumField(value: _storage._puzzleArchiveTypes, fieldNumber: 26)
+      }
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -4503,6 +4526,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
         if _storage._preferredImageAspectRatio != rhs_storage._preferredImageAspectRatio {return false}
         if _storage._tightenVerticalSpacing != rhs_storage._tightenVerticalSpacing {return false}
         if _storage._references != rhs_storage._references {return false}
+        if _storage._puzzleArchiveTypes != rhs_storage._puzzleArchiveTypes {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -6696,7 +6720,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
 }
 
 extension ProtoCard.CardType: SwiftProtobuf._ProtoNameProviding {
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CARD_TYPE_UNSPECIFIED\0\u{1}CARD_TYPE_ARTICLE\0\u{1}CARD_TYPE_PODCAST\0\u{1}CARD_TYPE_VIDEO\0\u{1}CARD_TYPE_CROSSWORD\0\u{1}CARD_TYPE_DISPLAY\0\u{1}CARD_TYPE_NUMBERED\0\u{1}CARD_TYPE_EMPTY\0\u{1}CARD_TYPE_WEB_CONTENT\0\u{1}CARD_TYPE_PODCAST_SERIES\0\u{1}CARD_TYPE_HIGHLIGHT\0\u{1}CARD_TYPE_NAVIGATION\0\u{1}CARD_TYPE_GALLERY\0\u{1}CARD_TYPE_PUZZLE\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0CARD_TYPE_UNSPECIFIED\0\u{1}CARD_TYPE_ARTICLE\0\u{1}CARD_TYPE_PODCAST\0\u{1}CARD_TYPE_VIDEO\0\u{1}CARD_TYPE_CROSSWORD\0\u{1}CARD_TYPE_DISPLAY\0\u{1}CARD_TYPE_NUMBERED\0\u{1}CARD_TYPE_EMPTY\0\u{1}CARD_TYPE_WEB_CONTENT\0\u{1}CARD_TYPE_PODCAST_SERIES\0\u{1}CARD_TYPE_HIGHLIGHT\0\u{1}CARD_TYPE_NAVIGATION\0\u{1}CARD_TYPE_GALLERY\0\u{1}CARD_TYPE_PUZZLE\0\u{1}CARD_TYPE_ELECTION\0")
 }
 
 extension ProtoCard.SublinksArrangement: SwiftProtobuf._ProtoNameProviding {
