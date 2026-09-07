@@ -45,6 +45,8 @@ extension BlueprintCard.BlueprintCardType: CustomStringConvertible {
             "Gallery"
         case .puzzle:
             "Puzzle"
+        case .election:
+            "Election Tracker"
         case .unrecognized:
             "Unrecognised"
         }
