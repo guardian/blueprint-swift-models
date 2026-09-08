@@ -44,7 +44,7 @@ jobs:
 
       - name: Save Swift packages cache
         uses: actions/cache/save@v6
-        if: always()
+        if: ${{ success() && steps.packages-cache.outputs.cache-hit != 'true' }}
         with:
           path: .build
           key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
