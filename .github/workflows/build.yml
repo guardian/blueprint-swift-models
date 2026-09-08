@@ -1,0 +1,50 @@
+name: Build
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # macos-26 (Tahoe) runner image defaults to Xcode 26, which is what we want to build against.
+    # See https://github.com/actions/runner-images/blob/main/images/macos/macos-26-Readme.md
+    runs-on: macos-26
+    if: ${{ !github.event.pull_request.draft }}
+    timeout-minutes: 30
+    steps:
+      - name: Checkout the pull request branch
+        uses: actions/checkout@v5
+
+      - name: Restore Swift packages cache
+        uses: actions/cache/restore@v6
+        id: packages-cache
+        with:
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            ${{ runner.os }}-spm-
+
+      - name: Build for iOS
+        run: |
+          xcodebuild build \
+            -scheme BlueprintModels \
+            -destination 'generic/platform=iOS' \
+            -skipMacroValidation | xcbeautify
+
+      - name: Save Swift packages cache
+        uses: actions/cache/save@v6
+        if: ${{ success() && steps.packages-cache.outputs.cache-hit != 'true' }}
+        with:
+          path: .build
+          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
