@@ -24,10 +24,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout the pull request branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Restore Swift packages cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         id: packages-cache
         with:
           path: .build
@@ -43,7 +43,7 @@ jobs:
             -skipMacroValidation | xcbeautify
 
       - name: Save Swift packages cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         if: always()
         with:
           path: .build
