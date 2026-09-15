@@ -112,6 +112,7 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
     public let basicTags: [BlueprintBasicTag]
     public let followUp: BlueprintFollowUp?
     public let mediaPill: BlueprintMediaPill?
+    public let customSubnavID: String?
     public private(set) var _backingData: Data?
 
     public init(
@@ -154,7 +155,8 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
          galleryImageCount: Int?,
          basicTags: [BlueprintBasicTag],
          followUp: BlueprintFollowUp?,
-         mediaPill: BlueprintMediaPill?
+         mediaPill: BlueprintMediaPill?,
+         customSubnavID: String?
     ) {
         self.id = id
         self.byline = byline
@@ -196,6 +198,7 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
         self.basicTags = basicTags
         self.followUp = followUp
         self.mediaPill = mediaPill
+        self.customSubnavID = customSubnavID
     }
 
     public init?(data: Data) {
@@ -375,6 +378,11 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
             self.mediaPill = BlueprintMediaPill(proto: proto.mediaPill)
         } else {
             self.mediaPill = nil
+        }
+        if proto.hasCustomSubnavID {
+            self.customSubnavID = proto.customSubnavID
+        } else {
+            self.customSubnavID = nil
         }
     }
 }
@@ -684,6 +692,7 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
     public let condensedPaletteLight: BlueprintPalette?
     public let condensedPaletteDark: BlueprintPalette?
     public let puzzle: BlueprintPuzzle?
+    public let eventGraphic: BlueprintEventGraphic?
     public let _localID = UUID()
     public private(set) var _backingData: Data?
 
@@ -716,7 +725,8 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
          shouldHideImage: Bool,
          condensedPaletteLight: BlueprintPalette?,
          condensedPaletteDark: BlueprintPalette?,
-         puzzle: BlueprintPuzzle?
+         puzzle: BlueprintPuzzle?,
+         eventGraphic: BlueprintEventGraphic?
     ) {
         self.type = type
         self.article = article
@@ -747,6 +757,7 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
         self.condensedPaletteLight = condensedPaletteLight
         self.condensedPaletteDark = condensedPaletteDark
         self.puzzle = puzzle
+        self.eventGraphic = eventGraphic
     }
 
     public init?(data: Data) {
@@ -895,6 +906,11 @@ public struct BlueprintCard: Hashable, Equatable, Sendable {
             self.puzzle = BlueprintPuzzle(proto: proto.puzzle)
         } else {
             self.puzzle = nil
+        }
+        if proto.hasEventGraphic {
+            self.eventGraphic = BlueprintEventGraphic(proto: proto.eventGraphic)
+        } else {
+            self.eventGraphic = nil
         }
     }
 }
@@ -1262,6 +1278,38 @@ public struct BlueprintCompetitionWithMatchDays: Hashable, Equatable, Sendable {
     internal init?(proto: ProtoCompetitionWithMatchDays) {
         self.matchDays = proto.matchDays.compactMap { BlueprintMatchDay(proto: $0) }
         self.competitionName = proto.competitionName
+    }
+}
+
+public struct BlueprintEventGraphic: Hashable, Equatable, Sendable {
+    public let id: String
+    public let dataUri: URL
+    public private(set) var _backingData: Data?
+
+    public init(
+         id: String,
+         dataUri: URL
+    ) {
+        self.id = id
+        self.dataUri = dataUri
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoEventGraphic(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoEventGraphic) {
+        self.id = proto.id
+        if let dataUri = URL(string: proto.dataUri) {
+            self.dataUri = dataUri
+        } else {
+            return nil
+        }
     }
 }
 
@@ -1663,6 +1711,7 @@ public struct BlueprintList: Hashable, Equatable, Sendable {
     public let lastUpdatedDate: Date?
     public let header: BlueprintHeader?
     public let tightenVerticalSpacing: Bool
+    public let customSubnavID: String?
     public private(set) var _backingData: Data?
 
     public init(
@@ -1684,7 +1733,8 @@ public struct BlueprintList: Hashable, Equatable, Sendable {
          adUnit: String,
          lastUpdatedDate: Date?,
          header: BlueprintHeader?,
-         tightenVerticalSpacing: Bool
+         tightenVerticalSpacing: Bool,
+         customSubnavID: String?
     ) {
         self.title = title
         self.nextPageURL = nextPageURL
@@ -1705,6 +1755,7 @@ public struct BlueprintList: Hashable, Equatable, Sendable {
         self.lastUpdatedDate = lastUpdatedDate
         self.header = header
         self.tightenVerticalSpacing = tightenVerticalSpacing
+        self.customSubnavID = customSubnavID
     }
 
     public init?(data: Data) {
@@ -1787,6 +1838,11 @@ public struct BlueprintList: Hashable, Equatable, Sendable {
             self.tightenVerticalSpacing = proto.tightenVerticalSpacing
         } else {
             self.tightenVerticalSpacing = false
+        }
+        if proto.hasCustomSubnavID {
+            self.customSubnavID = proto.customSubnavID
+        } else {
+            self.customSubnavID = nil
         }
     }
 }
