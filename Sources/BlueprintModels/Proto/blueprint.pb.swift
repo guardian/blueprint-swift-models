@@ -1268,6 +1268,15 @@ struct ProtoList: @unchecked Sendable {
   /// Clears the value of `tightenVerticalSpacing`. Subsequent reads from it will return its default value.
   mutating func clearTightenVerticalSpacing() {_uniqueStorage()._tightenVerticalSpacing = nil}
 
+  var customSubnavID: String {
+    get {return _storage._customSubnavID ?? String()}
+    set {_uniqueStorage()._customSubnavID = newValue}
+  }
+  /// Returns true if `customSubnavID` has been explicitly set.
+  var hasCustomSubnavID: Bool {return _storage._customSubnavID != nil}
+  /// Clears the value of `customSubnavID`. Subsequent reads from it will return its default value.
+  mutating func clearCustomSubnavID() {_uniqueStorage()._customSubnavID = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -2570,6 +2579,16 @@ struct ProtoArticle: @unchecked Sendable {
   /// Clears the value of `mediaPill`. Subsequent reads from it will return its default value.
   mutating func clearMediaPill() {_uniqueStorage()._mediaPill = nil}
 
+  /// Subnav that can appear at the top of an article
+  var customSubnavID: String {
+    get {return _storage._customSubnavID ?? String()}
+    set {_uniqueStorage()._customSubnavID = newValue}
+  }
+  /// Returns true if `customSubnavID` has been explicitly set.
+  var hasCustomSubnavID: Bool {return _storage._customSubnavID != nil}
+  /// Clears the value of `customSubnavID`. Subsequent reads from it will return its default value.
+  mutating func clearCustomSubnavID() {_uniqueStorage()._customSubnavID = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -2668,6 +2687,20 @@ struct ProtoPuzzle: @unchecked Sendable {
   init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
+}
+
+struct ProtoEventGraphic: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var id: String = String()
+
+  var dataUri: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
 }
 
 struct ProtoCard: @unchecked Sendable {
@@ -2995,6 +3028,15 @@ struct ProtoCard: @unchecked Sendable {
   var hasPuzzle: Bool {return _storage._puzzle != nil}
   /// Clears the value of `puzzle`. Subsequent reads from it will return its default value.
   mutating func clearPuzzle() {_uniqueStorage()._puzzle = nil}
+
+  var eventGraphic: ProtoEventGraphic {
+    get {return _storage._eventGraphic ?? ProtoEventGraphic()}
+    set {_uniqueStorage()._eventGraphic = newValue}
+  }
+  /// Returns true if `eventGraphic` has been explicitly set.
+  var hasEventGraphic: Bool {return _storage._eventGraphic != nil}
+  /// Clears the value of `eventGraphic`. Subsequent reads from it will return its default value.
+  mutating func clearEventGraphic() {_uniqueStorage()._eventGraphic = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -4633,7 +4675,7 @@ extension ProtoThrasher: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementa
 
 extension ProtoList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".List"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}title\0\u{3}next_page_url\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}branding\0\u{1}topics\0\u{3}ad_targeting_path\0\u{3}previous_page_url\0\u{1}tracking\0\u{1}adverts\0\u{3}my_guardian_follow\0\u{1}id\0\u{3}web_uri\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}last_updated_date\0\u{1}header\0\u{3}tighten_vertical_spacing\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}title\0\u{3}next_page_url\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}branding\0\u{1}topics\0\u{3}ad_targeting_path\0\u{3}previous_page_url\0\u{1}tracking\0\u{1}adverts\0\u{3}my_guardian_follow\0\u{1}id\0\u{3}web_uri\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}last_updated_date\0\u{1}header\0\u{3}tighten_vertical_spacing\0\u{3}custom_subnav_id\0")
 
   fileprivate class _StorageClass {
     var _title: String = String()
@@ -4655,6 +4697,7 @@ extension ProtoList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
     var _lastUpdatedDate: SwiftProtobuf.Google_Protobuf_Timestamp? = nil
     var _header: ProtoHeader? = nil
     var _tightenVerticalSpacing: Bool? = nil
+    var _customSubnavID: String? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -4684,6 +4727,7 @@ extension ProtoList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
       _lastUpdatedDate = source._lastUpdatedDate
       _header = source._header
       _tightenVerticalSpacing = source._tightenVerticalSpacing
+      _customSubnavID = source._customSubnavID
     }
   }
 
@@ -4721,6 +4765,7 @@ extension ProtoList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
         case 17: try { try decoder.decodeSingularMessageField(value: &_storage._lastUpdatedDate) }()
         case 18: try { try decoder.decodeSingularMessageField(value: &_storage._header) }()
         case 19: try { try decoder.decodeSingularBoolField(value: &_storage._tightenVerticalSpacing) }()
+        case 20: try { try decoder.decodeSingularStringField(value: &_storage._customSubnavID) }()
         default: break
         }
       }
@@ -4790,6 +4835,9 @@ extension ProtoList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
       try { if let v = _storage._tightenVerticalSpacing {
         try visitor.visitSingularBoolField(value: v, fieldNumber: 19)
       } }()
+      try { if let v = _storage._customSubnavID {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 20)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -4818,6 +4866,7 @@ extension ProtoList: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
         if _storage._lastUpdatedDate != rhs_storage._lastUpdatedDate {return false}
         if _storage._header != rhs_storage._header {return false}
         if _storage._tightenVerticalSpacing != rhs_storage._tightenVerticalSpacing {return false}
+        if _storage._customSubnavID != rhs_storage._customSubnavID {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -5986,7 +6035,7 @@ extension ProtoListenToArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
 
 extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Article"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{1}byline\0\u{1}images\0\u{1}links\0\u{1}kicker\0\u{1}title\0\u{3}trail_text\0\u{1}rating\0\u{3}comment_count\0\u{3}published_date\0\u{3}last_updated_date\0\u{3}media_type\0\u{1}duration\0\u{3}profile_image\0\u{1}events\0\u{3}palette_light\0\u{3}palette_dark\0\u{3}apple_podcast_url\0\u{3}google_podcast_url\0\u{3}spotify_podcast_url\0\u{1}videos\0\u{3}is_live\0\u{3}pocket_cast_podcast_url\0\u{3}rendered_item_prod\0\u{3}rendered_item_beta\0\u{3}show_quoted_headline\0\u{3}web_content_uri\0\u{1}tracking\0\u{1}audio\0\u{3}podcast_series\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}should_hide_reader_revenue\0\u{3}should_hide_adverts\0\u{3}should_hide_nav\0\u{3}listen_to_article\0\u{3}gallery_image_count\0\u{3}basic_tags\0\u{3}follow_up\0\u{3}media_pill\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{1}byline\0\u{1}images\0\u{1}links\0\u{1}kicker\0\u{1}title\0\u{3}trail_text\0\u{1}rating\0\u{3}comment_count\0\u{3}published_date\0\u{3}last_updated_date\0\u{3}media_type\0\u{1}duration\0\u{3}profile_image\0\u{1}events\0\u{3}palette_light\0\u{3}palette_dark\0\u{3}apple_podcast_url\0\u{3}google_podcast_url\0\u{3}spotify_podcast_url\0\u{1}videos\0\u{3}is_live\0\u{3}pocket_cast_podcast_url\0\u{3}rendered_item_prod\0\u{3}rendered_item_beta\0\u{3}show_quoted_headline\0\u{3}web_content_uri\0\u{1}tracking\0\u{1}audio\0\u{3}podcast_series\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}should_hide_reader_revenue\0\u{3}should_hide_adverts\0\u{3}should_hide_nav\0\u{3}listen_to_article\0\u{3}gallery_image_count\0\u{3}basic_tags\0\u{3}follow_up\0\u{3}media_pill\0\u{3}custom_subnav_id\0")
 
   fileprivate class _StorageClass {
     var _id: String = String()
@@ -6029,6 +6078,7 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
     var _basicTags: [ProtoBasicTag] = []
     var _followUp: ProtoFollowUp? = nil
     var _mediaPill: ProtoMediaPill? = nil
+    var _customSubnavID: String? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -6079,6 +6129,7 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
       _basicTags = source._basicTags
       _followUp = source._followUp
       _mediaPill = source._mediaPill
+      _customSubnavID = source._customSubnavID
     }
   }
 
@@ -6137,6 +6188,7 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
         case 38: try { try decoder.decodeRepeatedMessageField(value: &_storage._basicTags) }()
         case 39: try { try decoder.decodeSingularMessageField(value: &_storage._followUp) }()
         case 40: try { try decoder.decodeSingularMessageField(value: &_storage._mediaPill) }()
+        case 41: try { try decoder.decodeSingularStringField(value: &_storage._customSubnavID) }()
         default: break
         }
       }
@@ -6269,6 +6321,9 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
       try { if let v = _storage._mediaPill {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 40)
       } }()
+      try { if let v = _storage._customSubnavID {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 41)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -6318,6 +6373,7 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
         if _storage._basicTags != rhs_storage._basicTags {return false}
         if _storage._followUp != rhs_storage._followUp {return false}
         if _storage._mediaPill != rhs_storage._mediaPill {return false}
+        if _storage._customSubnavID != rhs_storage._customSubnavID {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -6453,9 +6509,44 @@ extension ProtoPuzzle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementati
   }
 }
 
+extension ProtoEventGraphic: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".EventGraphic"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}data_uri\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.id) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.dataUri) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.id.isEmpty {
+      try visitor.visitSingularStringField(value: self.id, fieldNumber: 1)
+    }
+    if !self.dataUri.isEmpty {
+      try visitor.visitSingularStringField(value: self.dataUri, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoEventGraphic, rhs: ProtoEventGraphic) -> Bool {
+    if lhs.id != rhs.id {return false}
+    if lhs.dataUri != rhs.dataUri {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
 extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Card"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}article\0\u{1}boosted\0\u{1}compact\0\u{1}sublinks\0\u{3}html_fallback\0\u{1}branding\0\u{3}premium_content\0\u{3}sublinks_palette_light\0\u{3}sublinks_palette_dark\0\u{3}card_number\0\u{3}podcast_series\0\u{3}uri_fallback\0\u{4}\u{18}corresponding_tags\0\u{3}mega_boosted\0\u{3}trail_image_size\0\u{4}\u{2}sublinks_arrangement\0\u{3}boosted_headline\0\u{3}headline_position\0\u{3}card_size\0\u{3}boost_level\0\u{3}preferred_sublinks_arrangement\0\u{3}top_border_style\0\u{3}headline_weight\0\u{3}nav_card_type\0\u{3}should_hide_image\0\u{3}condensed_palette_light\0\u{3}condensed_palette_dark\0\u{1}puzzle\0\u{b}trail_image_aspect_ratio\0\u{c}(\u{1}")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}type\0\u{1}article\0\u{1}boosted\0\u{1}compact\0\u{1}sublinks\0\u{3}html_fallback\0\u{1}branding\0\u{3}premium_content\0\u{3}sublinks_palette_light\0\u{3}sublinks_palette_dark\0\u{3}card_number\0\u{3}podcast_series\0\u{3}uri_fallback\0\u{4}\u{18}corresponding_tags\0\u{3}mega_boosted\0\u{3}trail_image_size\0\u{4}\u{2}sublinks_arrangement\0\u{3}boosted_headline\0\u{3}headline_position\0\u{3}card_size\0\u{3}boost_level\0\u{3}preferred_sublinks_arrangement\0\u{3}top_border_style\0\u{3}headline_weight\0\u{3}nav_card_type\0\u{3}should_hide_image\0\u{3}condensed_palette_light\0\u{3}condensed_palette_dark\0\u{1}puzzle\0\u{3}event_graphic\0\u{b}trail_image_aspect_ratio\0\u{c}(\u{1}")
 
   fileprivate class _StorageClass {
     var _type: ProtoCard.CardType = .unspecified
@@ -6487,6 +6578,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
     var _condensedPaletteLight: ProtoPalette? = nil
     var _condensedPaletteDark: ProtoPalette? = nil
     var _puzzle: ProtoPuzzle? = nil
+    var _eventGraphic: ProtoEventGraphic? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -6526,6 +6618,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
       _condensedPaletteLight = source._condensedPaletteLight
       _condensedPaletteDark = source._condensedPaletteDark
       _puzzle = source._puzzle
+      _eventGraphic = source._eventGraphic
     }
   }
 
@@ -6573,6 +6666,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
         case 51: try { try decoder.decodeSingularMessageField(value: &_storage._condensedPaletteLight) }()
         case 52: try { try decoder.decodeSingularMessageField(value: &_storage._condensedPaletteDark) }()
         case 53: try { try decoder.decodeSingularMessageField(value: &_storage._puzzle) }()
+        case 54: try { try decoder.decodeSingularMessageField(value: &_storage._eventGraphic) }()
         default: break
         }
       }
@@ -6672,6 +6766,9 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
       try { if let v = _storage._puzzle {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 53)
       } }()
+      try { if let v = _storage._eventGraphic {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 54)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -6710,6 +6807,7 @@ extension ProtoCard: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementation
         if _storage._condensedPaletteLight != rhs_storage._condensedPaletteLight {return false}
         if _storage._condensedPaletteDark != rhs_storage._condensedPaletteDark {return false}
         if _storage._puzzle != rhs_storage._puzzle {return false}
+        if _storage._eventGraphic != rhs_storage._eventGraphic {return false}
         return true
       }
       if !storagesAreEqual {return false}
