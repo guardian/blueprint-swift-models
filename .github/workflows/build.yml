@@ -26,25 +26,9 @@ jobs:
       - name: Checkout the pull request branch
         uses: actions/checkout@v5
 
-      - name: Restore Swift packages cache
-        uses: actions/cache/restore@v6
-        id: packages-cache
-        with:
-          path: .build
-          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
-          restore-keys: |
-            ${{ runner.os }}-spm-
-
       - name: Build for iOS
         run: |
           xcodebuild build \
             -scheme BlueprintModels \
             -destination 'generic/platform=iOS' \
             -skipMacroValidation | xcbeautify
-
-      - name: Save Swift packages cache
-        uses: actions/cache/save@v6
-        if: ${{ success() && steps.packages-cache.outputs.cache-hit != 'true' }}
-        with:
-          path: .build
-          key: ${{ runner.os }}-spm-${{ hashFiles('Package.resolved') }}
