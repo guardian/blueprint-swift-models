@@ -890,14 +890,16 @@ struct ProtoCollection: @unchecked Sendable {
   mutating func clearReferences() {_uniqueStorage()._references = nil}
 
   ///*
-  /// Ordered list of puzzle types that are available in this collection. This
-  /// is used to display the puzzle types in the archive menu for this
-  /// collection.
-  /// If this list is empty, the archive link should not be displayed.
-  var puzzleArchiveTypes: [ProtoPuzzleTypes] {
-    get {return _storage._puzzleArchiveTypes}
-    set {_uniqueStorage()._puzzleArchiveTypes = newValue}
+  /// Information about archive link on a puzzles collection. If absent, don't 
+  /// show the archive link.
+  var puzzleArchiveLink: ProtoPuzzleArchiveLink {
+    get {return _storage._puzzleArchiveLink ?? ProtoPuzzleArchiveLink()}
+    set {_uniqueStorage()._puzzleArchiveLink = newValue}
   }
+  /// Returns true if `puzzleArchiveLink` has been explicitly set.
+  var hasPuzzleArchiveLink: Bool {return _storage._puzzleArchiveLink != nil}
+  /// Clears the value of `puzzleArchiveLink`. Subsequent reads from it will return its default value.
+  mutating func clearPuzzleArchiveLink() {_uniqueStorage()._puzzleArchiveLink = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -2594,6 +2596,27 @@ struct ProtoArticle: @unchecked Sendable {
   init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
+}
+
+///*
+/// Represents a link to a collection of puzzles in the archive. 
+struct ProtoPuzzleArchiveLink: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  ///* User visible title for the archive link. 
+  var title: String = String()
+
+  ///*
+  /// Ordered list of puzzle types that are available in this collection. This
+  /// is used to display the puzzle types in the archive menu for this
+  /// collection.
+  var puzzleTypes: [ProtoPuzzleTypes] = []
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
 }
 
 ///*
@@ -4335,7 +4358,7 @@ extension ProtoFontWeight: SwiftProtobuf._ProtoNameProviding {
 
 extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Collection"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}title\0\u{1}branding\0\u{3}premium_content\0\u{3}follow_up\0\u{1}hideable\0\u{3}myguardian_follow\0\u{1}description\0\u{1}image\0\u{1}design\0\u{3}compact_padding\0\u{3}tracking_id\0\u{3}small_heading\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}heading_style\0\u{3}display_title\0\u{3}last_updated_date\0\u{3}title_style\0\u{3}preferred_image_aspect_ratio\0\u{3}tighten_vertical_spacing\0\u{1}references\0\u{3}puzzle_archive_types\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}title\0\u{1}branding\0\u{3}premium_content\0\u{3}follow_up\0\u{1}hideable\0\u{3}myguardian_follow\0\u{1}description\0\u{1}image\0\u{1}design\0\u{3}compact_padding\0\u{3}tracking_id\0\u{3}small_heading\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}heading_style\0\u{3}display_title\0\u{3}last_updated_date\0\u{3}title_style\0\u{3}preferred_image_aspect_ratio\0\u{3}tighten_vertical_spacing\0\u{1}references\0\u{4}\u{2}puzzle_archive_link\0\u{b}puzzle_archive_types\0\u{c}\u{1a}\u{1}")
 
   fileprivate class _StorageClass {
     var _id: String = String()
@@ -4363,7 +4386,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
     var _preferredImageAspectRatio: ProtoImageAspectRatio? = nil
     var _tightenVerticalSpacing: Bool? = nil
     var _references: ProtoTagReferences? = nil
-    var _puzzleArchiveTypes: [ProtoPuzzleTypes] = []
+    var _puzzleArchiveLink: ProtoPuzzleArchiveLink? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -4399,7 +4422,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       _preferredImageAspectRatio = source._preferredImageAspectRatio
       _tightenVerticalSpacing = source._tightenVerticalSpacing
       _references = source._references
-      _puzzleArchiveTypes = source._puzzleArchiveTypes
+      _puzzleArchiveLink = source._puzzleArchiveLink
     }
   }
 
@@ -4443,7 +4466,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
         case 23: try { try decoder.decodeSingularEnumField(value: &_storage._preferredImageAspectRatio) }()
         case 24: try { try decoder.decodeSingularBoolField(value: &_storage._tightenVerticalSpacing) }()
         case 25: try { try decoder.decodeSingularMessageField(value: &_storage._references) }()
-        case 26: try { try decoder.decodeRepeatedEnumField(value: &_storage._puzzleArchiveTypes) }()
+        case 27: try { try decoder.decodeSingularMessageField(value: &_storage._puzzleArchiveLink) }()
         default: break
         }
       }
@@ -4531,9 +4554,9 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       try { if let v = _storage._references {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 25)
       } }()
-      if !_storage._puzzleArchiveTypes.isEmpty {
-        try visitor.visitPackedEnumField(value: _storage._puzzleArchiveTypes, fieldNumber: 26)
-      }
+      try { if let v = _storage._puzzleArchiveLink {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 27)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -4568,7 +4591,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
         if _storage._preferredImageAspectRatio != rhs_storage._preferredImageAspectRatio {return false}
         if _storage._tightenVerticalSpacing != rhs_storage._tightenVerticalSpacing {return false}
         if _storage._references != rhs_storage._references {return false}
-        if _storage._puzzleArchiveTypes != rhs_storage._puzzleArchiveTypes {return false}
+        if _storage._puzzleArchiveLink != rhs_storage._puzzleArchiveLink {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -6378,6 +6401,41 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
       }
       if !storagesAreEqual {return false}
     }
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ProtoPuzzleArchiveLink: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".PuzzleArchiveLink"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}title\0\u{3}puzzle_types\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.title) }()
+      case 2: try { try decoder.decodeRepeatedEnumField(value: &self.puzzleTypes) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.title.isEmpty {
+      try visitor.visitSingularStringField(value: self.title, fieldNumber: 1)
+    }
+    if !self.puzzleTypes.isEmpty {
+      try visitor.visitPackedEnumField(value: self.puzzleTypes, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoPuzzleArchiveLink, rhs: ProtoPuzzleArchiveLink) -> Bool {
+    if lhs.title != rhs.title {return false}
+    if lhs.puzzleTypes != rhs.puzzleTypes {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
