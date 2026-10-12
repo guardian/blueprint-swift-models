@@ -1001,11 +1001,9 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
     public let tightenVerticalSpacing: Bool
     public let references: BlueprintTagReferences?
 
-    // Ordered list of puzzle types that are available in this collection. This
-    // is used to display the puzzle types in the archive menu for this
-    // collection.
-    // If this list is empty, the archive link should not be displayed.
-    public let puzzleArchiveTypes: [BlueprintPuzzleTypes]
+    // Information about archive link on a puzzles collection. If absent, don't
+    // show the archive link.
+    public let puzzleArchiveLink: BlueprintPuzzleArchiveLink?
     public private(set) var _backingData: Data?
 
     public init(
@@ -1034,7 +1032,7 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
          preferredImageAspectRatio: BlueprintImageAspectRatio?,
          tightenVerticalSpacing: Bool,
          references: BlueprintTagReferences?,
-         puzzleArchiveTypes: [BlueprintPuzzleTypes]
+         puzzleArchiveLink: BlueprintPuzzleArchiveLink?
     ) {
         self.id = id
         self.paletteLight = paletteLight
@@ -1061,7 +1059,7 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
         self.preferredImageAspectRatio = preferredImageAspectRatio
         self.tightenVerticalSpacing = tightenVerticalSpacing
         self.references = references
-        self.puzzleArchiveTypes = puzzleArchiveTypes
+        self.puzzleArchiveLink = puzzleArchiveLink
     }
 
     public init?(data: Data) {
@@ -1187,7 +1185,11 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
         } else {
             self.references = nil
         }
-        self.puzzleArchiveTypes = proto.puzzleArchiveTypes.compactMap { BlueprintPuzzleTypes(proto: $0) }
+        if proto.hasPuzzleArchiveLink {
+            self.puzzleArchiveLink = BlueprintPuzzleArchiveLink(proto: proto.puzzleArchiveLink)
+        } else {
+            self.puzzleArchiveLink = nil
+        }
     }
 }
 
@@ -2442,6 +2444,40 @@ public struct BlueprintPuzzle: Hashable, Equatable, Sendable {
         } else {
             self.frequency = nil
         }
+    }
+}
+
+public struct BlueprintPuzzleArchiveLink: Hashable, Equatable, Sendable {
+
+    // User visible title for the archive link.
+    public let title: String
+
+    // Ordered list of puzzle types that are available in this collection. This
+    // is used to display the puzzle types in the archive menu for this
+    // collection.
+    public let puzzleTypes: [BlueprintPuzzleTypes]
+    public private(set) var _backingData: Data?
+
+    public init(
+         title: String,
+         puzzleTypes: [BlueprintPuzzleTypes]
+    ) {
+        self.title = title
+        self.puzzleTypes = puzzleTypes
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoPuzzleArchiveLink(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoPuzzleArchiveLink) {
+        self.title = proto.title
+        self.puzzleTypes = proto.puzzleTypes.compactMap { BlueprintPuzzleTypes(proto: $0) }
     }
 }
 
