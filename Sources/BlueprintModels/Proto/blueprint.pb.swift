@@ -2591,11 +2591,106 @@ struct ProtoArticle: @unchecked Sendable {
   /// Clears the value of `customSubnavID`. Subsequent reads from it will return its default value.
   mutating func clearCustomSubnavID() {_uniqueStorage()._customSubnavID = nil}
 
+  /// Only applicable to articles containing a multimedia slideshow atom
+  var multimediaSlideshow: ProtoMultimediaSlideshow {
+    get {return _storage._multimediaSlideshow ?? ProtoMultimediaSlideshow()}
+    set {_uniqueStorage()._multimediaSlideshow = newValue}
+  }
+  /// Returns true if `multimediaSlideshow` has been explicitly set.
+  var hasMultimediaSlideshow: Bool {return _storage._multimediaSlideshow != nil}
+  /// Clears the value of `multimediaSlideshow`. Subsequent reads from it will return its default value.
+  mutating func clearMultimediaSlideshow() {_uniqueStorage()._multimediaSlideshow = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
+}
+
+///*
+/// A single slide within a multimedia slideshow, displaying either a still
+/// image or a video.
+struct ProtoMultimediaSlide: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var content: ProtoMultimediaSlide.OneOf_Content? = nil
+
+  var image: ProtoImage {
+    get {
+      if case .image(let v)? = content {return v}
+      return ProtoImage()
+    }
+    set {content = .image(newValue)}
+  }
+
+  var video: ProtoVideo {
+    get {
+      if case .video(let v)? = content {return v}
+      return ProtoVideo()
+    }
+    set {content = .video(newValue)}
+  }
+
+  /// Short text label for the slide, distinct from the media's caption or credit
+  var label: String {
+    get {return _label ?? String()}
+    set {_label = newValue}
+  }
+  /// Returns true if `label` has been explicitly set.
+  var hasLabel: Bool {return self._label != nil}
+  /// Clears the value of `label`. Subsequent reads from it will return its default value.
+  mutating func clearLabel() {self._label = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  enum OneOf_Content: Equatable, Sendable {
+    case image(ProtoImage)
+    case video(ProtoVideo)
+
+  }
+
+  init() {}
+
+  fileprivate var _label: String? = nil
+}
+
+///*
+/// A multimedia slideshow made up of an ordered list of slides.
+struct ProtoMultimediaSlideshow: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var slides: [ProtoMultimediaSlide] = []
+
+  var title: String {
+    get {return _title ?? String()}
+    set {_title = newValue}
+  }
+  /// Returns true if `title` has been explicitly set.
+  var hasTitle: Bool {return self._title != nil}
+  /// Clears the value of `title`. Subsequent reads from it will return its default value.
+  mutating func clearTitle() {self._title = nil}
+
+  /// The aspect ratio the slideshow is displayed at, e.g. "16:9", "5:4"
+  var aspectRatio: String {
+    get {return _aspectRatio ?? String()}
+    set {_aspectRatio = newValue}
+  }
+  /// Returns true if `aspectRatio` has been explicitly set.
+  var hasAspectRatio: Bool {return self._aspectRatio != nil}
+  /// Clears the value of `aspectRatio`. Subsequent reads from it will return its default value.
+  mutating func clearAspectRatio() {self._aspectRatio = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _title: String? = nil
+  fileprivate var _aspectRatio: String? = nil
 }
 
 ///*
@@ -6058,7 +6153,7 @@ extension ProtoListenToArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImp
 
 extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Article"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{1}byline\0\u{1}images\0\u{1}links\0\u{1}kicker\0\u{1}title\0\u{3}trail_text\0\u{1}rating\0\u{3}comment_count\0\u{3}published_date\0\u{3}last_updated_date\0\u{3}media_type\0\u{1}duration\0\u{3}profile_image\0\u{1}events\0\u{3}palette_light\0\u{3}palette_dark\0\u{3}apple_podcast_url\0\u{3}google_podcast_url\0\u{3}spotify_podcast_url\0\u{1}videos\0\u{3}is_live\0\u{3}pocket_cast_podcast_url\0\u{3}rendered_item_prod\0\u{3}rendered_item_beta\0\u{3}show_quoted_headline\0\u{3}web_content_uri\0\u{1}tracking\0\u{1}audio\0\u{3}podcast_series\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}should_hide_reader_revenue\0\u{3}should_hide_adverts\0\u{3}should_hide_nav\0\u{3}listen_to_article\0\u{3}gallery_image_count\0\u{3}basic_tags\0\u{3}follow_up\0\u{3}media_pill\0\u{3}custom_subnav_id\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{1}byline\0\u{1}images\0\u{1}links\0\u{1}kicker\0\u{1}title\0\u{3}trail_text\0\u{1}rating\0\u{3}comment_count\0\u{3}published_date\0\u{3}last_updated_date\0\u{3}media_type\0\u{1}duration\0\u{3}profile_image\0\u{1}events\0\u{3}palette_light\0\u{3}palette_dark\0\u{3}apple_podcast_url\0\u{3}google_podcast_url\0\u{3}spotify_podcast_url\0\u{1}videos\0\u{3}is_live\0\u{3}pocket_cast_podcast_url\0\u{3}rendered_item_prod\0\u{3}rendered_item_beta\0\u{3}show_quoted_headline\0\u{3}web_content_uri\0\u{1}tracking\0\u{1}audio\0\u{3}podcast_series\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}should_hide_reader_revenue\0\u{3}should_hide_adverts\0\u{3}should_hide_nav\0\u{3}listen_to_article\0\u{3}gallery_image_count\0\u{3}basic_tags\0\u{3}follow_up\0\u{3}media_pill\0\u{3}custom_subnav_id\0\u{3}multimedia_slideshow\0")
 
   fileprivate class _StorageClass {
     var _id: String = String()
@@ -6102,6 +6197,7 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
     var _followUp: ProtoFollowUp? = nil
     var _mediaPill: ProtoMediaPill? = nil
     var _customSubnavID: String? = nil
+    var _multimediaSlideshow: ProtoMultimediaSlideshow? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -6153,6 +6249,7 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
       _followUp = source._followUp
       _mediaPill = source._mediaPill
       _customSubnavID = source._customSubnavID
+      _multimediaSlideshow = source._multimediaSlideshow
     }
   }
 
@@ -6212,6 +6309,7 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
         case 39: try { try decoder.decodeSingularMessageField(value: &_storage._followUp) }()
         case 40: try { try decoder.decodeSingularMessageField(value: &_storage._mediaPill) }()
         case 41: try { try decoder.decodeSingularStringField(value: &_storage._customSubnavID) }()
+        case 42: try { try decoder.decodeSingularMessageField(value: &_storage._multimediaSlideshow) }()
         default: break
         }
       }
@@ -6347,6 +6445,9 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
       try { if let v = _storage._customSubnavID {
         try visitor.visitSingularStringField(value: v, fieldNumber: 41)
       } }()
+      try { if let v = _storage._multimediaSlideshow {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 42)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -6397,10 +6498,127 @@ extension ProtoArticle: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
         if _storage._followUp != rhs_storage._followUp {return false}
         if _storage._mediaPill != rhs_storage._mediaPill {return false}
         if _storage._customSubnavID != rhs_storage._customSubnavID {return false}
+        if _storage._multimediaSlideshow != rhs_storage._multimediaSlideshow {return false}
         return true
       }
       if !storagesAreEqual {return false}
     }
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ProtoMultimediaSlide: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".MultimediaSlide"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}image\0\u{1}video\0\u{1}label\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try {
+        var v: ProtoImage?
+        var hadOneofValue = false
+        if let current = self.content {
+          hadOneofValue = true
+          if case .image(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.content = .image(v)
+        }
+      }()
+      case 2: try {
+        var v: ProtoVideo?
+        var hadOneofValue = false
+        if let current = self.content {
+          hadOneofValue = true
+          if case .video(let m) = current {v = m}
+        }
+        try decoder.decodeSingularMessageField(value: &v)
+        if let v = v {
+          if hadOneofValue {try decoder.handleConflictingOneOf()}
+          self.content = .video(v)
+        }
+      }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self._label) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    switch self.content {
+    case .image?: try {
+      guard case .image(let v)? = self.content else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    }()
+    case .video?: try {
+      guard case .video(let v)? = self.content else { preconditionFailure() }
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
+    }()
+    case nil: break
+    }
+    try { if let v = self._label {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 3)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoMultimediaSlide, rhs: ProtoMultimediaSlide) -> Bool {
+    if lhs.content != rhs.content {return false}
+    if lhs._label != rhs._label {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ProtoMultimediaSlideshow: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".MultimediaSlideshow"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}slides\0\u{1}title\0\u{3}aspect_ratio\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.slides) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self._title) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self._aspectRatio) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    if !self.slides.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.slides, fieldNumber: 1)
+    }
+    try { if let v = self._title {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+    } }()
+    try { if let v = self._aspectRatio {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 3)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoMultimediaSlideshow, rhs: ProtoMultimediaSlideshow) -> Bool {
+    if lhs.slides != rhs.slides {return false}
+    if lhs._title != rhs._title {return false}
+    if lhs._aspectRatio != rhs._aspectRatio {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
