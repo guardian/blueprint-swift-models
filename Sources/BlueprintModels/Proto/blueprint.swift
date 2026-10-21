@@ -113,6 +113,7 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
     public let followUp: BlueprintFollowUp?
     public let mediaPill: BlueprintMediaPill?
     public let customSubnavID: String?
+    public let multimediaSlideshow: BlueprintMultimediaSlideshow?
     public private(set) var _backingData: Data?
 
     public init(
@@ -156,7 +157,8 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
          basicTags: [BlueprintBasicTag],
          followUp: BlueprintFollowUp?,
          mediaPill: BlueprintMediaPill?,
-         customSubnavID: String?
+         customSubnavID: String?,
+         multimediaSlideshow: BlueprintMultimediaSlideshow?
     ) {
         self.id = id
         self.byline = byline
@@ -199,6 +201,7 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
         self.followUp = followUp
         self.mediaPill = mediaPill
         self.customSubnavID = customSubnavID
+        self.multimediaSlideshow = multimediaSlideshow
     }
 
     public init?(data: Data) {
@@ -383,6 +386,11 @@ public struct BlueprintArticle: Hashable, Equatable, Sendable {
             self.customSubnavID = proto.customSubnavID
         } else {
             self.customSubnavID = nil
+        }
+        if proto.hasMultimediaSlideshow {
+            self.multimediaSlideshow = BlueprintMultimediaSlideshow(proto: proto.multimediaSlideshow)
+        } else {
+            self.multimediaSlideshow = nil
         }
     }
 }
@@ -2073,6 +2081,112 @@ public struct BlueprintMediaPill: Hashable, Equatable, Sendable {
         self.name = proto.name
         self.icon = proto.icon
         self.detail = proto.detail
+    }
+}
+
+public struct BlueprintMultimediaSlide: Hashable, Equatable, Sendable {
+    public let label: String?
+    public let content: BlueprintMultimediaSlide.OneOf_Content?
+    public private(set) var _backingData: Data?
+
+    public init(
+         label: String?,
+         content: BlueprintMultimediaSlide.OneOf_Content?
+    ) {
+        self.label = label
+        self.content = content
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoMultimediaSlide(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoMultimediaSlide) {
+        if proto.hasLabel {
+            self.label = proto.label
+        } else {
+            self.label = nil
+        }
+        if let contentProto = proto.content {
+            if let content = BlueprintMultimediaSlide.OneOf_Content(proto: contentProto) {
+                self.content = content
+            } else {
+                return nil
+            }
+        } else {
+            self.content = nil
+        }
+    }
+}
+
+extension BlueprintMultimediaSlide {
+    public enum OneOf_Content: Hashable, Equatable, Sendable {
+        indirect case image(BlueprintImage)
+        indirect case video(BlueprintVideo)
+
+        internal init?(proto: ProtoMultimediaSlide.OneOf_Content) {
+            switch proto {
+            case .image(let value):
+                if let converted = BlueprintImage(proto: value) as BlueprintImage? {
+                    self = .image(converted)
+                } else {
+                    return nil
+                }
+            case .video(let value):
+                if let converted = BlueprintVideo(proto: value) as BlueprintVideo? {
+                    self = .video(converted)
+                } else {
+                    return nil
+                }
+            @unknown default:
+                return nil
+            }
+        }
+    }
+}
+
+public struct BlueprintMultimediaSlideshow: Hashable, Equatable, Sendable {
+    public let slides: [BlueprintMultimediaSlide]
+    public let title: String?
+    public let aspectRatio: String?
+    public private(set) var _backingData: Data?
+
+    public init(
+         slides: [BlueprintMultimediaSlide],
+         title: String?,
+         aspectRatio: String?
+    ) {
+        self.slides = slides
+        self.title = title
+        self.aspectRatio = aspectRatio
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoMultimediaSlideshow(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoMultimediaSlideshow) {
+        self.slides = proto.slides.compactMap { BlueprintMultimediaSlide(proto: $0) }
+        if proto.hasTitle {
+            self.title = proto.title
+        } else {
+            self.title = nil
+        }
+        if proto.hasAspectRatio {
+            self.aspectRatio = proto.aspectRatio
+        } else {
+            self.aspectRatio = nil
+        }
     }
 }
 
