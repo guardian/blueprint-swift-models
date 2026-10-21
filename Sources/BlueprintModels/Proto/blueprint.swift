@@ -2085,19 +2085,16 @@ public struct BlueprintMediaPill: Hashable, Equatable, Sendable {
 }
 
 public struct BlueprintMultimediaSlide: Hashable, Equatable, Sendable {
-    public let image: BlueprintImage
-    public let video: BlueprintVideo
     public let label: String?
+    public let content: BlueprintMultimediaSlide.OneOf_Content?
     public private(set) var _backingData: Data?
 
     public init(
-         image: BlueprintImage,
-         video: BlueprintVideo,
-         label: String?
+         label: String?,
+         content: BlueprintMultimediaSlide.OneOf_Content?
     ) {
-        self.image = image
-        self.video = video
         self.label = label
+        self.content = content
     }
 
     public init?(data: Data) {
@@ -2110,20 +2107,45 @@ public struct BlueprintMultimediaSlide: Hashable, Equatable, Sendable {
     }
 
     internal init?(proto: ProtoMultimediaSlide) {
-        if let image = BlueprintImage(proto: proto.image) as BlueprintImage? {
-            self.image = image
-        } else {
-            return nil
-        }
-        if let video = BlueprintVideo(proto: proto.video) as BlueprintVideo? {
-            self.video = video
-        } else {
-            return nil
-        }
         if proto.hasLabel {
             self.label = proto.label
         } else {
             self.label = nil
+        }
+        if let contentProto = proto.content {
+            if let content = BlueprintMultimediaSlide.OneOf_Content(proto: contentProto) {
+                self.content = content
+            } else {
+                return nil
+            }
+        } else {
+            self.content = nil
+        }
+    }
+}
+
+extension BlueprintMultimediaSlide {
+    public enum OneOf_Content: Hashable, Equatable, Sendable {
+        indirect case image(BlueprintImage)
+        indirect case video(BlueprintVideo)
+
+        internal init?(proto: ProtoMultimediaSlide.OneOf_Content) {
+            switch proto {
+            case .image(let value):
+                if let converted = BlueprintImage(proto: value) as BlueprintImage? {
+                    self = .image(converted)
+                } else {
+                    return nil
+                }
+            case .video(let value):
+                if let converted = BlueprintVideo(proto: value) as BlueprintVideo? {
+                    self = .video(converted)
+                } else {
+                    return nil
+                }
+            @unknown default:
+                return nil
+            }
         }
     }
 }
