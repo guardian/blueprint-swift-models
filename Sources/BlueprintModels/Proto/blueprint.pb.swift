@@ -901,6 +901,19 @@ struct ProtoCollection: @unchecked Sendable {
   /// Clears the value of `puzzleArchiveLink`. Subsequent reads from it will return its default value.
   mutating func clearPuzzleArchiveLink() {_uniqueStorage()._puzzleArchiveLink = nil}
 
+  ///*
+  /// A sponsored puzzles container carries its sponsor here. The same sponsor
+  /// may also be delivered separately at the front level with a different
+  /// layout.
+  var sponsor: ProtoSponsor {
+    get {return _storage._sponsor ?? ProtoSponsor()}
+    set {_uniqueStorage()._sponsor = newValue}
+  }
+  /// Returns true if `sponsor` has been explicitly set.
+  var hasSponsor: Bool {return _storage._sponsor != nil}
+  /// Clears the value of `sponsor`. Subsequent reads from it will return its default value.
+  mutating func clearSponsor() {_uniqueStorage()._sponsor = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   ///*
@@ -996,6 +1009,281 @@ struct ProtoCollection: @unchecked Sendable {
   init() {}
 
   fileprivate var _storage = _StorageClass.defaultInstance
+}
+
+///*
+/// A server-driven description of a sponsor and how it should be presented.
+/// The same sponsor may be delivered at multiple levels with a different
+/// layout for each; the consuming level determines its placement.
+struct ProtoSponsor: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var name: String = String()
+
+  var label: String = String()
+
+  ///* The full spoken description of the sponsor for accessibility. 
+  var accessibilityLabel: String = String()
+
+  ///* Opens when the sponsored unit is tapped. 
+  var sponsorUri: String = String()
+
+  ///* Optional link providing more information about the sponsorship. 
+  var aboutUri: String {
+    get {return _aboutUri ?? String()}
+    set {_aboutUri = newValue}
+  }
+  /// Returns true if `aboutUri` has been explicitly set.
+  var hasAboutUri: Bool {return self._aboutUri != nil}
+  /// Clears the value of `aboutUri`. Subsequent reads from it will return its default value.
+  mutating func clearAboutUri() {self._aboutUri = nil}
+
+  var logo: ProtoSponsor.Logo {
+    get {return _logo ?? ProtoSponsor.Logo()}
+    set {_logo = newValue}
+  }
+  /// Returns true if `logo` has been explicitly set.
+  var hasLogo: Bool {return self._logo != nil}
+  /// Clears the value of `logo`. Subsequent reads from it will return its default value.
+  mutating func clearLogo() {self._logo = nil}
+
+  var layout: ProtoSponsor.Layout {
+    get {return _layout ?? ProtoSponsor.Layout()}
+    set {_layout = newValue}
+  }
+  /// Returns true if `layout` has been explicitly set.
+  var hasLayout: Bool {return self._layout != nil}
+  /// Clears the value of `layout`. Subsequent reads from it will return its default value.
+  mutating func clearLayout() {self._layout = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  struct Logo: Sendable {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    ///*
+    /// URL of the logo for light appearance; artwork should be tightly cropped.
+    var lightURL: String = String()
+
+    ///* Optional URL of the logo variant for dark appearance. 
+    var darkURL: String {
+      get {return _darkURL ?? String()}
+      set {_darkURL = newValue}
+    }
+    /// Returns true if `darkURL` has been explicitly set.
+    var hasDarkURL: Bool {return self._darkURL != nil}
+    /// Clears the value of `darkURL`. Subsequent reads from it will return its default value.
+    mutating func clearDarkURL() {self._darkURL = nil}
+
+    ///* Width divided by height of the tightly cropped logo artwork. 
+    var aspectRatio: Double = 0
+
+    ///*
+    /// Optional optical wordmark baseline as a fraction from the top of the
+    /// artwork (0...1). Leave unset for marks without a text baseline.
+    var baseline: Double {
+      get {return _baseline ?? 0}
+      set {_baseline = newValue}
+    }
+    /// Returns true if `baseline` has been explicitly set.
+    var hasBaseline: Bool {return self._baseline != nil}
+    /// Clears the value of `baseline`. Subsequent reads from it will return its default value.
+    mutating func clearBaseline() {self._baseline = nil}
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    init() {}
+
+    fileprivate var _darkURL: String? = nil
+    fileprivate var _baseline: Double? = nil
+  }
+
+  struct Layout: Sendable {
+    // SwiftProtobuf.Message conformance is added in an extension below. See the
+    // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+    // methods supported on all messages.
+
+    var labelPosition: ProtoSponsor.Layout.LabelPosition = .unspecified
+
+    var labelAlignment: ProtoSponsor.Layout.LabelAlignment = .unspecified
+
+    var verticalPlacement: ProtoSponsor.Layout.VerticalPlacement = .unspecified
+
+    ///* Target logo height in points. 
+    var logoHeight: Double = 0
+
+    ///* Optional maximum logo width in points. 
+    var logoMaxWidth: Double {
+      get {return _logoMaxWidth ?? 0}
+      set {_logoMaxWidth = newValue}
+    }
+    /// Returns true if `logoMaxWidth` has been explicitly set.
+    var hasLogoMaxWidth: Bool {return self._logoMaxWidth != nil}
+    /// Clears the value of `logoMaxWidth`. Subsequent reads from it will return its default value.
+    mutating func clearLogoMaxWidth() {self._logoMaxWidth = nil}
+
+    ///* Space between the label and logo in points. 
+    var gap: Double = 0
+
+    var unknownFields = SwiftProtobuf.UnknownStorage()
+
+    ///*
+    /// Where the label appears relative to the logo. The label should never
+    /// wrap.
+    enum LabelPosition: SwiftProtobuf.Enum, Swift.CaseIterable {
+      typealias RawValue = Int
+      case unspecified // = 0
+      case leading // = 1
+      case trailing // = 2
+      case above // = 3
+      case below // = 4
+      case none // = 5
+      case UNRECOGNIZED(Int)
+
+      init() {
+        self = .unspecified
+      }
+
+      init?(rawValue: Int) {
+        switch rawValue {
+        case 0: self = .unspecified
+        case 1: self = .leading
+        case 2: self = .trailing
+        case 3: self = .above
+        case 4: self = .below
+        case 5: self = .none
+        default: self = .UNRECOGNIZED(rawValue)
+        }
+      }
+
+      var rawValue: Int {
+        switch self {
+        case .unspecified: return 0
+        case .leading: return 1
+        case .trailing: return 2
+        case .above: return 3
+        case .below: return 4
+        case .none: return 5
+        case .UNRECOGNIZED(let i): return i
+        }
+      }
+
+      // The compiler won't synthesize support with the UNRECOGNIZED case.
+      static let allCases: [ProtoSponsor.Layout.LabelPosition] = [
+        .unspecified,
+        .leading,
+        .trailing,
+        .above,
+        .below,
+        .none,
+      ]
+
+    }
+
+    ///* How the label is aligned with the logo. 
+    enum LabelAlignment: SwiftProtobuf.Enum, Swift.CaseIterable {
+      typealias RawValue = Int
+      case unspecified // = 0
+      case center // = 1
+      case baseline // = 2
+      case UNRECOGNIZED(Int)
+
+      init() {
+        self = .unspecified
+      }
+
+      init?(rawValue: Int) {
+        switch rawValue {
+        case 0: self = .unspecified
+        case 1: self = .center
+        case 2: self = .baseline
+        default: self = .UNRECOGNIZED(rawValue)
+        }
+      }
+
+      var rawValue: Int {
+        switch self {
+        case .unspecified: return 0
+        case .center: return 1
+        case .baseline: return 2
+        case .UNRECOGNIZED(let i): return i
+        }
+      }
+
+      // The compiler won't synthesize support with the UNRECOGNIZED case.
+      static let allCases: [ProtoSponsor.Layout.LabelAlignment] = [
+        .unspecified,
+        .center,
+        .baseline,
+      ]
+
+    }
+
+    ///* How the label and logo are positioned vertically in their slot. 
+    enum VerticalPlacement: SwiftProtobuf.Enum, Swift.CaseIterable {
+      typealias RawValue = Int
+      case unspecified // = 0
+      case top // = 1
+      case center // = 2
+      case bottom // = 3
+      case labelBaseline // = 4
+      case logoBaseline // = 5
+      case UNRECOGNIZED(Int)
+
+      init() {
+        self = .unspecified
+      }
+
+      init?(rawValue: Int) {
+        switch rawValue {
+        case 0: self = .unspecified
+        case 1: self = .top
+        case 2: self = .center
+        case 3: self = .bottom
+        case 4: self = .labelBaseline
+        case 5: self = .logoBaseline
+        default: self = .UNRECOGNIZED(rawValue)
+        }
+      }
+
+      var rawValue: Int {
+        switch self {
+        case .unspecified: return 0
+        case .top: return 1
+        case .center: return 2
+        case .bottom: return 3
+        case .labelBaseline: return 4
+        case .logoBaseline: return 5
+        case .UNRECOGNIZED(let i): return i
+        }
+      }
+
+      // The compiler won't synthesize support with the UNRECOGNIZED case.
+      static let allCases: [ProtoSponsor.Layout.VerticalPlacement] = [
+        .unspecified,
+        .top,
+        .center,
+        .bottom,
+        .labelBaseline,
+        .logoBaseline,
+      ]
+
+    }
+
+    init() {}
+
+    fileprivate var _logoMaxWidth: Double? = nil
+  }
+
+  init() {}
+
+  fileprivate var _aboutUri: String? = nil
+  fileprivate var _logo: ProtoSponsor.Logo? = nil
+  fileprivate var _layout: ProtoSponsor.Layout? = nil
 }
 
 ///*
@@ -4453,7 +4741,7 @@ extension ProtoFontWeight: SwiftProtobuf._ProtoNameProviding {
 
 extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Collection"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}title\0\u{1}branding\0\u{3}premium_content\0\u{3}follow_up\0\u{1}hideable\0\u{3}myguardian_follow\0\u{1}description\0\u{1}image\0\u{1}design\0\u{3}compact_padding\0\u{3}tracking_id\0\u{3}small_heading\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}heading_style\0\u{3}display_title\0\u{3}last_updated_date\0\u{3}title_style\0\u{3}preferred_image_aspect_ratio\0\u{3}tighten_vertical_spacing\0\u{1}references\0\u{4}\u{2}puzzle_archive_link\0\u{b}puzzle_archive_types\0\u{c}\u{1a}\u{1}")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}id\0\u{3}palette_light\0\u{3}palette_dark\0\u{1}rows\0\u{1}title\0\u{1}branding\0\u{3}premium_content\0\u{3}follow_up\0\u{1}hideable\0\u{3}myguardian_follow\0\u{1}description\0\u{1}image\0\u{1}design\0\u{3}compact_padding\0\u{3}tracking_id\0\u{3}small_heading\0\u{3}ad_targeting_params\0\u{3}ad_unit\0\u{3}heading_style\0\u{3}display_title\0\u{3}last_updated_date\0\u{3}title_style\0\u{3}preferred_image_aspect_ratio\0\u{3}tighten_vertical_spacing\0\u{1}references\0\u{4}\u{2}puzzle_archive_link\0\u{1}sponsor\0\u{b}puzzle_archive_types\0\u{c}\u{1a}\u{1}")
 
   fileprivate class _StorageClass {
     var _id: String = String()
@@ -4482,6 +4770,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
     var _tightenVerticalSpacing: Bool? = nil
     var _references: ProtoTagReferences? = nil
     var _puzzleArchiveLink: ProtoPuzzleArchiveLink? = nil
+    var _sponsor: ProtoSponsor? = nil
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -4518,6 +4807,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       _tightenVerticalSpacing = source._tightenVerticalSpacing
       _references = source._references
       _puzzleArchiveLink = source._puzzleArchiveLink
+      _sponsor = source._sponsor
     }
   }
 
@@ -4562,6 +4852,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
         case 24: try { try decoder.decodeSingularBoolField(value: &_storage._tightenVerticalSpacing) }()
         case 25: try { try decoder.decodeSingularMessageField(value: &_storage._references) }()
         case 27: try { try decoder.decodeSingularMessageField(value: &_storage._puzzleArchiveLink) }()
+        case 28: try { try decoder.decodeSingularMessageField(value: &_storage._sponsor) }()
         default: break
         }
       }
@@ -4652,6 +4943,9 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
       try { if let v = _storage._puzzleArchiveLink {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 27)
       } }()
+      try { if let v = _storage._sponsor {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 28)
+      } }()
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -4687,6 +4981,7 @@ extension ProtoCollection: SwiftProtobuf.Message, SwiftProtobuf._MessageImplemen
         if _storage._tightenVerticalSpacing != rhs_storage._tightenVerticalSpacing {return false}
         if _storage._references != rhs_storage._references {return false}
         if _storage._puzzleArchiveLink != rhs_storage._puzzleArchiveLink {return false}
+        if _storage._sponsor != rhs_storage._sponsor {return false}
         return true
       }
       if !storagesAreEqual {return false}
@@ -4702,6 +4997,190 @@ extension ProtoCollection.CollectionDesign: SwiftProtobuf._ProtoNameProviding {
 
 extension ProtoCollection.HeadingStyle: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0HEADING_STYLE_UNSPECIFIED\0\u{1}HEADING_STYLE_HIDDEN\0\u{1}HEADING_STYLE_REGULAR\0\u{1}HEADING_STYLE_SMALL\0")
+}
+
+extension ProtoSponsor: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".Sponsor"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}name\0\u{1}label\0\u{3}accessibility_label\0\u{3}sponsor_uri\0\u{3}about_uri\0\u{1}logo\0\u{1}layout\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.name) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.label) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self.accessibilityLabel) }()
+      case 4: try { try decoder.decodeSingularStringField(value: &self.sponsorUri) }()
+      case 5: try { try decoder.decodeSingularStringField(value: &self._aboutUri) }()
+      case 6: try { try decoder.decodeSingularMessageField(value: &self._logo) }()
+      case 7: try { try decoder.decodeSingularMessageField(value: &self._layout) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    if !self.name.isEmpty {
+      try visitor.visitSingularStringField(value: self.name, fieldNumber: 1)
+    }
+    if !self.label.isEmpty {
+      try visitor.visitSingularStringField(value: self.label, fieldNumber: 2)
+    }
+    if !self.accessibilityLabel.isEmpty {
+      try visitor.visitSingularStringField(value: self.accessibilityLabel, fieldNumber: 3)
+    }
+    if !self.sponsorUri.isEmpty {
+      try visitor.visitSingularStringField(value: self.sponsorUri, fieldNumber: 4)
+    }
+    try { if let v = self._aboutUri {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 5)
+    } }()
+    try { if let v = self._logo {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
+    } }()
+    try { if let v = self._layout {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 7)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoSponsor, rhs: ProtoSponsor) -> Bool {
+    if lhs.name != rhs.name {return false}
+    if lhs.label != rhs.label {return false}
+    if lhs.accessibilityLabel != rhs.accessibilityLabel {return false}
+    if lhs.sponsorUri != rhs.sponsorUri {return false}
+    if lhs._aboutUri != rhs._aboutUri {return false}
+    if lhs._logo != rhs._logo {return false}
+    if lhs._layout != rhs._layout {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ProtoSponsor.Logo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = ProtoSponsor.protoMessageName + ".Logo"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}light_url\0\u{3}dark_url\0\u{3}aspect_ratio\0\u{1}baseline\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.lightURL) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self._darkURL) }()
+      case 3: try { try decoder.decodeSingularDoubleField(value: &self.aspectRatio) }()
+      case 4: try { try decoder.decodeSingularDoubleField(value: &self._baseline) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    if !self.lightURL.isEmpty {
+      try visitor.visitSingularStringField(value: self.lightURL, fieldNumber: 1)
+    }
+    try { if let v = self._darkURL {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+    } }()
+    if self.aspectRatio.bitPattern != 0 {
+      try visitor.visitSingularDoubleField(value: self.aspectRatio, fieldNumber: 3)
+    }
+    try { if let v = self._baseline {
+      try visitor.visitSingularDoubleField(value: v, fieldNumber: 4)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoSponsor.Logo, rhs: ProtoSponsor.Logo) -> Bool {
+    if lhs.lightURL != rhs.lightURL {return false}
+    if lhs._darkURL != rhs._darkURL {return false}
+    if lhs.aspectRatio != rhs.aspectRatio {return false}
+    if lhs._baseline != rhs._baseline {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ProtoSponsor.Layout: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = ProtoSponsor.protoMessageName + ".Layout"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}label_position\0\u{3}label_alignment\0\u{3}vertical_placement\0\u{3}logo_height\0\u{3}logo_max_width\0\u{1}gap\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularEnumField(value: &self.labelPosition) }()
+      case 2: try { try decoder.decodeSingularEnumField(value: &self.labelAlignment) }()
+      case 3: try { try decoder.decodeSingularEnumField(value: &self.verticalPlacement) }()
+      case 4: try { try decoder.decodeSingularDoubleField(value: &self.logoHeight) }()
+      case 5: try { try decoder.decodeSingularDoubleField(value: &self._logoMaxWidth) }()
+      case 6: try { try decoder.decodeSingularDoubleField(value: &self.gap) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    if self.labelPosition != .unspecified {
+      try visitor.visitSingularEnumField(value: self.labelPosition, fieldNumber: 1)
+    }
+    if self.labelAlignment != .unspecified {
+      try visitor.visitSingularEnumField(value: self.labelAlignment, fieldNumber: 2)
+    }
+    if self.verticalPlacement != .unspecified {
+      try visitor.visitSingularEnumField(value: self.verticalPlacement, fieldNumber: 3)
+    }
+    if self.logoHeight.bitPattern != 0 {
+      try visitor.visitSingularDoubleField(value: self.logoHeight, fieldNumber: 4)
+    }
+    try { if let v = self._logoMaxWidth {
+      try visitor.visitSingularDoubleField(value: v, fieldNumber: 5)
+    } }()
+    if self.gap.bitPattern != 0 {
+      try visitor.visitSingularDoubleField(value: self.gap, fieldNumber: 6)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: ProtoSponsor.Layout, rhs: ProtoSponsor.Layout) -> Bool {
+    if lhs.labelPosition != rhs.labelPosition {return false}
+    if lhs.labelAlignment != rhs.labelAlignment {return false}
+    if lhs.verticalPlacement != rhs.verticalPlacement {return false}
+    if lhs.logoHeight != rhs.logoHeight {return false}
+    if lhs._logoMaxWidth != rhs._logoMaxWidth {return false}
+    if lhs.gap != rhs.gap {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension ProtoSponsor.Layout.LabelPosition: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0LABEL_POSITION_UNSPECIFIED\0\u{1}LABEL_POSITION_LEADING\0\u{1}LABEL_POSITION_TRAILING\0\u{1}LABEL_POSITION_ABOVE\0\u{1}LABEL_POSITION_BELOW\0\u{1}LABEL_POSITION_NONE\0")
+}
+
+extension ProtoSponsor.Layout.LabelAlignment: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0LABEL_ALIGNMENT_UNSPECIFIED\0\u{1}LABEL_ALIGNMENT_CENTER\0\u{1}LABEL_ALIGNMENT_BASELINE\0")
+}
+
+extension ProtoSponsor.Layout.VerticalPlacement: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0VERTICAL_PLACEMENT_UNSPECIFIED\0\u{1}VERTICAL_PLACEMENT_TOP\0\u{1}VERTICAL_PLACEMENT_CENTER\0\u{1}VERTICAL_PLACEMENT_BOTTOM\0\u{1}VERTICAL_PLACEMENT_LABEL_BASELINE\0\u{1}VERTICAL_PLACEMENT_LOGO_BASELINE\0")
 }
 
 extension ProtoFollowUp: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {

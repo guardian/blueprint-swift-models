@@ -1012,6 +1012,11 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
     // Information about archive link on a puzzles collection. If absent, don't
     // show the archive link.
     public let puzzleArchiveLink: BlueprintPuzzleArchiveLink?
+
+    // A sponsored puzzles container carries its sponsor here. The same sponsor
+    // may also be delivered separately at the front level with a different
+    // layout.
+    public let sponsor: BlueprintSponsor?
     public private(set) var _backingData: Data?
 
     public init(
@@ -1040,7 +1045,8 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
          preferredImageAspectRatio: BlueprintImageAspectRatio?,
          tightenVerticalSpacing: Bool,
          references: BlueprintTagReferences?,
-         puzzleArchiveLink: BlueprintPuzzleArchiveLink?
+         puzzleArchiveLink: BlueprintPuzzleArchiveLink?,
+         sponsor: BlueprintSponsor?
     ) {
         self.id = id
         self.paletteLight = paletteLight
@@ -1068,6 +1074,7 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
         self.tightenVerticalSpacing = tightenVerticalSpacing
         self.references = references
         self.puzzleArchiveLink = puzzleArchiveLink
+        self.sponsor = sponsor
     }
 
     public init?(data: Data) {
@@ -1197,6 +1204,11 @@ public struct BlueprintCollection: Hashable, Equatable, Sendable {
             self.puzzleArchiveLink = BlueprintPuzzleArchiveLink(proto: proto.puzzleArchiveLink)
         } else {
             self.puzzleArchiveLink = nil
+        }
+        if proto.hasSponsor {
+            self.sponsor = BlueprintSponsor(proto: proto.sponsor)
+        } else {
+            self.sponsor = nil
         }
     }
 }
@@ -2759,6 +2771,164 @@ public struct BlueprintRow: Hashable, Equatable, Sendable {
     }
 }
 
+public struct BlueprintSponsor: Hashable, Equatable, Sendable {
+    public let name: String
+    public let label: String
+
+    // The full spoken description of the sponsor for accessibility.
+    public let accessibilityLabel: String
+
+    // Opens when the sponsored unit is tapped.
+    public let sponsorUri: URL
+
+    // Optional link providing more information about the sponsorship.
+    public let aboutUri: URL?
+    public let logo: BlueprintLogo
+    public let layout: BlueprintLayout
+
+    // URL of the logo for light appearance; artwork should be tightly cropped.
+    public let lightURL: URL
+
+    // Optional URL of the logo variant for dark appearance.
+    public let darkURL: URL?
+
+    // Width divided by height of the tightly cropped logo artwork.
+    public let aspectRatio: Double
+
+    // Optional optical wordmark baseline as a fraction from the top of the
+    // artwork (0...1). Leave unset for marks without a text baseline.
+    public let baseline: Double?
+
+    // Where the label appears relative to the logo. The label should never
+    // wrap.
+    // How the label is aligned with the logo.
+    // How the label and logo are positioned vertically in their slot.
+    public let labelPosition: BlueprintLabelPosition
+    public let labelAlignment: BlueprintLabelAlignment
+    public let verticalPlacement: BlueprintVerticalPlacement
+
+    // Target logo height in points.
+    public let logoHeight: Double
+
+    // Optional maximum logo width in points.
+    public let logoMaxWidth: Double?
+
+    // Space between the label and logo in points.
+    public let gap: Double
+    public private(set) var _backingData: Data?
+
+    public init(
+         name: String,
+         label: String,
+         accessibilityLabel: String,
+         sponsorUri: URL,
+         aboutUri: URL?,
+         logo: BlueprintLogo,
+         layout: BlueprintLayout,
+         lightURL: URL,
+         darkURL: URL?,
+         aspectRatio: Double,
+         baseline: Double?,
+         labelPosition: BlueprintLabelPosition,
+         labelAlignment: BlueprintLabelAlignment,
+         verticalPlacement: BlueprintVerticalPlacement,
+         logoHeight: Double,
+         logoMaxWidth: Double?,
+         gap: Double
+    ) {
+        self.name = name
+        self.label = label
+        self.accessibilityLabel = accessibilityLabel
+        self.sponsorUri = sponsorUri
+        self.aboutUri = aboutUri
+        self.logo = logo
+        self.layout = layout
+        self.lightURL = lightURL
+        self.darkURL = darkURL
+        self.aspectRatio = aspectRatio
+        self.baseline = baseline
+        self.labelPosition = labelPosition
+        self.labelAlignment = labelAlignment
+        self.verticalPlacement = verticalPlacement
+        self.logoHeight = logoHeight
+        self.logoMaxWidth = logoMaxWidth
+        self.gap = gap
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoSponsor(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoSponsor) {
+        self.name = proto.name
+        self.label = proto.label
+        self.accessibilityLabel = proto.accessibilityLabel
+        if let sponsorUri = URL(string: proto.sponsorUri) {
+            self.sponsorUri = sponsorUri
+        } else {
+            return nil
+        }
+        if proto.hasAboutUri {
+            self.aboutUri = URL(string: proto.aboutUri)
+        } else {
+            self.aboutUri = nil
+        }
+        if let logo = BlueprintLogo(proto: proto.logo) as BlueprintLogo? {
+            self.logo = logo
+        } else {
+            return nil
+        }
+        if let layout = BlueprintLayout(proto: proto.layout) as BlueprintLayout? {
+            self.layout = layout
+        } else {
+            return nil
+        }
+        if let lightURL = URL(string: proto.lightURL) {
+            self.lightURL = lightURL
+        } else {
+            return nil
+        }
+        if proto.hasDarkURL {
+            self.darkURL = URL(string: proto.darkURL)
+        } else {
+            self.darkURL = nil
+        }
+        self.aspectRatio = proto.aspectRatio
+        if proto.hasBaseline {
+            self.baseline = proto.baseline
+        } else {
+            self.baseline = nil
+        }
+        if let labelPosition = BlueprintLabelPosition(proto: proto.labelPosition) as BlueprintLabelPosition? {
+            self.labelPosition = labelPosition
+        } else {
+            return nil
+        }
+        if let labelAlignment = BlueprintLabelAlignment(proto: proto.labelAlignment) as BlueprintLabelAlignment? {
+            self.labelAlignment = labelAlignment
+        } else {
+            return nil
+        }
+        if let verticalPlacement = BlueprintVerticalPlacement(proto: proto.verticalPlacement) as BlueprintVerticalPlacement? {
+            self.verticalPlacement = verticalPlacement
+        } else {
+            return nil
+        }
+        self.logoHeight = proto.logoHeight
+        if proto.hasLogoMaxWidth {
+            self.logoMaxWidth = proto.logoMaxWidth
+        } else {
+            self.logoMaxWidth = nil
+        }
+        self.gap = proto.gap
+    }
+}
+
 public struct BlueprintTable: Hashable, Equatable, Sendable {
 
     // The group name, for example "Group A". Only useful
@@ -3558,6 +3728,43 @@ public enum BlueprintImageAspectRatio: Int, CaseIterable, Hashable, Equatable, S
     }
 }
 
+extension BlueprintSponsor {
+    public enum BlueprintLabelAlignment: Int, CaseIterable, Hashable, Equatable, Sendable {
+        case unspecified = 0
+        case center = 1
+        case baseline = 2
+        case unrecognized = 9999
+
+        internal init(proto: ProtoSponsor.LabelAlignment) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
+        }
+    }
+}
+
+extension BlueprintSponsor {
+    public enum BlueprintLabelPosition: Int, CaseIterable, Hashable, Equatable, Sendable {
+        case unspecified = 0
+        case leading = 1
+        case trailing = 2
+        case above = 3
+        case below = 4
+        case none = 5
+        case unrecognized = 9999
+
+        internal init(proto: ProtoSponsor.LabelPosition) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
+        }
+    }
+}
+
 public enum BlueprintMediaType: Int, CaseIterable, Hashable, Equatable, Sendable {
     case unspecified = 0
     case video = 1
@@ -3740,6 +3947,26 @@ public enum BlueprintTopBorderStyle: Int, CaseIterable, Hashable, Equatable, Sen
             self = value
         } else {
             self = .unrecognized
+        }
+    }
+}
+
+extension BlueprintSponsor {
+    public enum BlueprintVerticalPlacement: Int, CaseIterable, Hashable, Equatable, Sendable {
+        case unspecified = 0
+        case top = 1
+        case center = 2
+        case bottom = 3
+        case labelBaseline = 4
+        case logoBaseline = 5
+        case unrecognized = 9999
+
+        internal init(proto: ProtoSponsor.VerticalPlacement) {
+            if let value = Self(rawValue: proto.rawValue) {
+                self = value
+            } else {
+                self = .unrecognized
+            }
         }
     }
 }
