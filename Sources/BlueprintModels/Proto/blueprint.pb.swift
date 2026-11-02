@@ -1015,48 +1015,60 @@ struct ProtoCollection: @unchecked Sendable {
 /// A server-driven description of a sponsor and how it should be presented.
 /// The same sponsor may be delivered at multiple levels with a different
 /// layout for each; the consuming level determines its placement.
-struct ProtoSponsor: Sendable {
+struct ProtoSponsor: @unchecked Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
   // methods supported on all messages.
 
-  var name: String = String()
+  var name: String {
+    get {return _storage._name}
+    set {_uniqueStorage()._name = newValue}
+  }
 
-  var label: String = String()
+  var label: String {
+    get {return _storage._label}
+    set {_uniqueStorage()._label = newValue}
+  }
 
   ///* The full spoken description of the sponsor for accessibility. 
-  var accessibilityLabel: String = String()
+  var accessibilityLabel: String {
+    get {return _storage._accessibilityLabel}
+    set {_uniqueStorage()._accessibilityLabel = newValue}
+  }
 
   ///* Opens when the sponsored unit is tapped. 
-  var sponsorUri: String = String()
+  var sponsorUri: String {
+    get {return _storage._sponsorUri}
+    set {_uniqueStorage()._sponsorUri = newValue}
+  }
 
   ///* Optional link providing more information about the sponsorship. 
   var aboutUri: String {
-    get {return _aboutUri ?? String()}
-    set {_aboutUri = newValue}
+    get {return _storage._aboutUri ?? String()}
+    set {_uniqueStorage()._aboutUri = newValue}
   }
   /// Returns true if `aboutUri` has been explicitly set.
-  var hasAboutUri: Bool {return self._aboutUri != nil}
+  var hasAboutUri: Bool {return _storage._aboutUri != nil}
   /// Clears the value of `aboutUri`. Subsequent reads from it will return its default value.
-  mutating func clearAboutUri() {self._aboutUri = nil}
+  mutating func clearAboutUri() {_uniqueStorage()._aboutUri = nil}
 
   var logo: ProtoSponsor.Logo {
-    get {return _logo ?? ProtoSponsor.Logo()}
-    set {_logo = newValue}
+    get {return _storage._logo ?? ProtoSponsor.Logo()}
+    set {_uniqueStorage()._logo = newValue}
   }
   /// Returns true if `logo` has been explicitly set.
-  var hasLogo: Bool {return self._logo != nil}
+  var hasLogo: Bool {return _storage._logo != nil}
   /// Clears the value of `logo`. Subsequent reads from it will return its default value.
-  mutating func clearLogo() {self._logo = nil}
+  mutating func clearLogo() {_uniqueStorage()._logo = nil}
 
   var layout: ProtoSponsor.Layout {
-    get {return _layout ?? ProtoSponsor.Layout()}
-    set {_layout = newValue}
+    get {return _storage._layout ?? ProtoSponsor.Layout()}
+    set {_uniqueStorage()._layout = newValue}
   }
   /// Returns true if `layout` has been explicitly set.
-  var hasLayout: Bool {return self._layout != nil}
+  var hasLayout: Bool {return _storage._layout != nil}
   /// Clears the value of `layout`. Subsequent reads from it will return its default value.
-  mutating func clearLayout() {self._layout = nil}
+  mutating func clearLayout() {_uniqueStorage()._layout = nil}
 
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1065,41 +1077,32 @@ struct ProtoSponsor: Sendable {
     // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
     // methods supported on all messages.
 
-    ///*
-    /// URL of the logo for light appearance; artwork should be tightly cropped.
-    var lightURL: String = String()
-
-    ///* Optional URL of the logo variant for dark appearance. 
-    var darkURL: String {
-      get {return _darkURL ?? String()}
-      set {_darkURL = newValue}
+    ///* The light appearance logo artwork. 
+    var light: ProtoImage {
+      get {return _light ?? ProtoImage()}
+      set {_light = newValue}
     }
-    /// Returns true if `darkURL` has been explicitly set.
-    var hasDarkURL: Bool {return self._darkURL != nil}
-    /// Clears the value of `darkURL`. Subsequent reads from it will return its default value.
-    mutating func clearDarkURL() {self._darkURL = nil}
+    /// Returns true if `light` has been explicitly set.
+    var hasLight: Bool {return self._light != nil}
+    /// Clears the value of `light`. Subsequent reads from it will return its default value.
+    mutating func clearLight() {self._light = nil}
 
-    ///* Width divided by height of the tightly cropped logo artwork. 
-    var aspectRatio: Double = 0
-
-    ///*
-    /// Optional optical wordmark baseline as a fraction from the top of the
-    /// artwork (0...1). Leave unset for marks without a text baseline.
-    var baseline: Double {
-      get {return _baseline ?? 0}
-      set {_baseline = newValue}
+    ///* Optional dark appearance logo artwork. 
+    var dark: ProtoImage {
+      get {return _dark ?? ProtoImage()}
+      set {_dark = newValue}
     }
-    /// Returns true if `baseline` has been explicitly set.
-    var hasBaseline: Bool {return self._baseline != nil}
-    /// Clears the value of `baseline`. Subsequent reads from it will return its default value.
-    mutating func clearBaseline() {self._baseline = nil}
+    /// Returns true if `dark` has been explicitly set.
+    var hasDark: Bool {return self._dark != nil}
+    /// Clears the value of `dark`. Subsequent reads from it will return its default value.
+    mutating func clearDark() {self._dark = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
     init() {}
 
-    fileprivate var _darkURL: String? = nil
-    fileprivate var _baseline: Double? = nil
+    fileprivate var _light: ProtoImage? = nil
+    fileprivate var _dark: ProtoImage? = nil
   }
 
   struct Layout: Sendable {
@@ -1128,6 +1131,18 @@ struct ProtoSponsor: Sendable {
 
     ///* Space between the label and logo in points. 
     var gap: Double = 0
+
+    ///*
+    /// Optional optical wordmark baseline as a fraction from the top of the
+    /// artwork (0...1). Leave unset for marks without a text baseline.
+    var logoBaseline: Double {
+      get {return _logoBaseline ?? 0}
+      set {_logoBaseline = newValue}
+    }
+    /// Returns true if `logoBaseline` has been explicitly set.
+    var hasLogoBaseline: Bool {return self._logoBaseline != nil}
+    /// Clears the value of `logoBaseline`. Subsequent reads from it will return its default value.
+    mutating func clearLogoBaseline() {self._logoBaseline = nil}
 
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
@@ -1277,13 +1292,12 @@ struct ProtoSponsor: Sendable {
     init() {}
 
     fileprivate var _logoMaxWidth: Double? = nil
+    fileprivate var _logoBaseline: Double? = nil
   }
 
   init() {}
 
-  fileprivate var _aboutUri: String? = nil
-  fileprivate var _logo: ProtoSponsor.Logo? = nil
-  fileprivate var _layout: ProtoSponsor.Layout? = nil
+  fileprivate var _storage = _StorageClass.defaultInstance
 }
 
 ///*
@@ -5003,61 +5017,109 @@ extension ProtoSponsor: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
   static let protoMessageName: String = _protobuf_package + ".Sponsor"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}name\0\u{1}label\0\u{3}accessibility_label\0\u{3}sponsor_uri\0\u{3}about_uri\0\u{1}logo\0\u{1}layout\0")
 
+  fileprivate class _StorageClass {
+    var _name: String = String()
+    var _label: String = String()
+    var _accessibilityLabel: String = String()
+    var _sponsorUri: String = String()
+    var _aboutUri: String? = nil
+    var _logo: ProtoSponsor.Logo? = nil
+    var _layout: ProtoSponsor.Layout? = nil
+
+      // This property is used as the initial default value for new instances of the type.
+      // The type itself is protecting the reference to its storage via CoW semantics.
+      // This will force a copy to be made of this reference when the first mutation occurs;
+      // hence, it is safe to mark this as `nonisolated(unsafe)`.
+      static nonisolated(unsafe) let defaultInstance = _StorageClass()
+
+    private init() {}
+
+    init(copying source: _StorageClass) {
+      _name = source._name
+      _label = source._label
+      _accessibilityLabel = source._accessibilityLabel
+      _sponsorUri = source._sponsorUri
+      _aboutUri = source._aboutUri
+      _logo = source._logo
+      _layout = source._layout
+    }
+  }
+
+  fileprivate mutating func _uniqueStorage() -> _StorageClass {
+    if !isKnownUniquelyReferenced(&_storage) {
+      _storage = _StorageClass(copying: _storage)
+    }
+    return _storage
+  }
+
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
-    while let fieldNumber = try decoder.nextFieldNumber() {
-      // The use of inline closures is to circumvent an issue where the compiler
-      // allocates stack space for every case branch when no optimizations are
-      // enabled. https://github.com/apple/swift-protobuf/issues/1034
-      switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.name) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self.label) }()
-      case 3: try { try decoder.decodeSingularStringField(value: &self.accessibilityLabel) }()
-      case 4: try { try decoder.decodeSingularStringField(value: &self.sponsorUri) }()
-      case 5: try { try decoder.decodeSingularStringField(value: &self._aboutUri) }()
-      case 6: try { try decoder.decodeSingularMessageField(value: &self._logo) }()
-      case 7: try { try decoder.decodeSingularMessageField(value: &self._layout) }()
-      default: break
+    _ = _uniqueStorage()
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      while let fieldNumber = try decoder.nextFieldNumber() {
+        // The use of inline closures is to circumvent an issue where the compiler
+        // allocates stack space for every case branch when no optimizations are
+        // enabled. https://github.com/apple/swift-protobuf/issues/1034
+        switch fieldNumber {
+        case 1: try { try decoder.decodeSingularStringField(value: &_storage._name) }()
+        case 2: try { try decoder.decodeSingularStringField(value: &_storage._label) }()
+        case 3: try { try decoder.decodeSingularStringField(value: &_storage._accessibilityLabel) }()
+        case 4: try { try decoder.decodeSingularStringField(value: &_storage._sponsorUri) }()
+        case 5: try { try decoder.decodeSingularStringField(value: &_storage._aboutUri) }()
+        case 6: try { try decoder.decodeSingularMessageField(value: &_storage._logo) }()
+        case 7: try { try decoder.decodeSingularMessageField(value: &_storage._layout) }()
+        default: break
+        }
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
-    // The use of inline closures is to circumvent an issue where the compiler
-    // allocates stack space for every if/case branch local when no optimizations
-    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
-    // https://github.com/apple/swift-protobuf/issues/1182
-    if !self.name.isEmpty {
-      try visitor.visitSingularStringField(value: self.name, fieldNumber: 1)
+    try withExtendedLifetime(_storage) { (_storage: _StorageClass) in
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every if/case branch local when no optimizations
+      // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+      // https://github.com/apple/swift-protobuf/issues/1182
+      if !_storage._name.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._name, fieldNumber: 1)
+      }
+      if !_storage._label.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._label, fieldNumber: 2)
+      }
+      if !_storage._accessibilityLabel.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._accessibilityLabel, fieldNumber: 3)
+      }
+      if !_storage._sponsorUri.isEmpty {
+        try visitor.visitSingularStringField(value: _storage._sponsorUri, fieldNumber: 4)
+      }
+      try { if let v = _storage._aboutUri {
+        try visitor.visitSingularStringField(value: v, fieldNumber: 5)
+      } }()
+      try { if let v = _storage._logo {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
+      } }()
+      try { if let v = _storage._layout {
+        try visitor.visitSingularMessageField(value: v, fieldNumber: 7)
+      } }()
     }
-    if !self.label.isEmpty {
-      try visitor.visitSingularStringField(value: self.label, fieldNumber: 2)
-    }
-    if !self.accessibilityLabel.isEmpty {
-      try visitor.visitSingularStringField(value: self.accessibilityLabel, fieldNumber: 3)
-    }
-    if !self.sponsorUri.isEmpty {
-      try visitor.visitSingularStringField(value: self.sponsorUri, fieldNumber: 4)
-    }
-    try { if let v = self._aboutUri {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 5)
-    } }()
-    try { if let v = self._logo {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 6)
-    } }()
-    try { if let v = self._layout {
-      try visitor.visitSingularMessageField(value: v, fieldNumber: 7)
-    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: ProtoSponsor, rhs: ProtoSponsor) -> Bool {
-    if lhs.name != rhs.name {return false}
-    if lhs.label != rhs.label {return false}
-    if lhs.accessibilityLabel != rhs.accessibilityLabel {return false}
-    if lhs.sponsorUri != rhs.sponsorUri {return false}
-    if lhs._aboutUri != rhs._aboutUri {return false}
-    if lhs._logo != rhs._logo {return false}
-    if lhs._layout != rhs._layout {return false}
+    if lhs._storage !== rhs._storage {
+      let storagesAreEqual: Bool = withExtendedLifetime((lhs._storage, rhs._storage)) { (_args: (_StorageClass, _StorageClass)) in
+        let _storage = _args.0
+        let rhs_storage = _args.1
+        if _storage._name != rhs_storage._name {return false}
+        if _storage._label != rhs_storage._label {return false}
+        if _storage._accessibilityLabel != rhs_storage._accessibilityLabel {return false}
+        if _storage._sponsorUri != rhs_storage._sponsorUri {return false}
+        if _storage._aboutUri != rhs_storage._aboutUri {return false}
+        if _storage._logo != rhs_storage._logo {return false}
+        if _storage._layout != rhs_storage._layout {return false}
+        return true
+      }
+      if !storagesAreEqual {return false}
+    }
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -5065,7 +5127,7 @@ extension ProtoSponsor: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementat
 
 extension ProtoSponsor.Logo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = ProtoSponsor.protoMessageName + ".Logo"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}light_url\0\u{3}dark_url\0\u{3}aspect_ratio\0\u{1}baseline\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}light\0\u{1}dark\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -5073,10 +5135,8 @@ extension ProtoSponsor.Logo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
       // allocates stack space for every case branch when no optimizations are
       // enabled. https://github.com/apple/swift-protobuf/issues/1034
       switch fieldNumber {
-      case 1: try { try decoder.decodeSingularStringField(value: &self.lightURL) }()
-      case 2: try { try decoder.decodeSingularStringField(value: &self._darkURL) }()
-      case 3: try { try decoder.decodeSingularDoubleField(value: &self.aspectRatio) }()
-      case 4: try { try decoder.decodeSingularDoubleField(value: &self._baseline) }()
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._light) }()
+      case 2: try { try decoder.decodeSingularMessageField(value: &self._dark) }()
       default: break
       }
     }
@@ -5087,26 +5147,18 @@ extension ProtoSponsor.Logo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
     // allocates stack space for every if/case branch local when no optimizations
     // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
     // https://github.com/apple/swift-protobuf/issues/1182
-    if !self.lightURL.isEmpty {
-      try visitor.visitSingularStringField(value: self.lightURL, fieldNumber: 1)
-    }
-    try { if let v = self._darkURL {
-      try visitor.visitSingularStringField(value: v, fieldNumber: 2)
+    try { if let v = self._light {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
     } }()
-    if self.aspectRatio.bitPattern != 0 {
-      try visitor.visitSingularDoubleField(value: self.aspectRatio, fieldNumber: 3)
-    }
-    try { if let v = self._baseline {
-      try visitor.visitSingularDoubleField(value: v, fieldNumber: 4)
+    try { if let v = self._dark {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 2)
     } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: ProtoSponsor.Logo, rhs: ProtoSponsor.Logo) -> Bool {
-    if lhs.lightURL != rhs.lightURL {return false}
-    if lhs._darkURL != rhs._darkURL {return false}
-    if lhs.aspectRatio != rhs.aspectRatio {return false}
-    if lhs._baseline != rhs._baseline {return false}
+    if lhs._light != rhs._light {return false}
+    if lhs._dark != rhs._dark {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -5114,7 +5166,7 @@ extension ProtoSponsor.Logo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplem
 
 extension ProtoSponsor.Layout: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = ProtoSponsor.protoMessageName + ".Layout"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}label_position\0\u{3}label_alignment\0\u{3}vertical_placement\0\u{3}logo_height\0\u{3}logo_max_width\0\u{1}gap\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}label_position\0\u{3}label_alignment\0\u{3}vertical_placement\0\u{3}logo_height\0\u{3}logo_max_width\0\u{1}gap\0\u{3}logo_baseline\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -5128,6 +5180,7 @@ extension ProtoSponsor.Layout: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
       case 4: try { try decoder.decodeSingularDoubleField(value: &self.logoHeight) }()
       case 5: try { try decoder.decodeSingularDoubleField(value: &self._logoMaxWidth) }()
       case 6: try { try decoder.decodeSingularDoubleField(value: &self.gap) }()
+      case 7: try { try decoder.decodeSingularDoubleField(value: &self._logoBaseline) }()
       default: break
       }
     }
@@ -5156,6 +5209,9 @@ extension ProtoSponsor.Layout: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if self.gap.bitPattern != 0 {
       try visitor.visitSingularDoubleField(value: self.gap, fieldNumber: 6)
     }
+    try { if let v = self._logoBaseline {
+      try visitor.visitSingularDoubleField(value: v, fieldNumber: 7)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -5166,6 +5222,7 @@ extension ProtoSponsor.Layout: SwiftProtobuf.Message, SwiftProtobuf._MessageImpl
     if lhs.logoHeight != rhs.logoHeight {return false}
     if lhs._logoMaxWidth != rhs._logoMaxWidth {return false}
     if lhs.gap != rhs.gap {return false}
+    if lhs._logoBaseline != rhs._logoBaseline {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
