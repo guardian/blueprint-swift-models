@@ -2786,11 +2786,18 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
     public let logo: BlueprintLogo
     public let layout: BlueprintLayout
 
-    // The light appearance logo artwork.
-    public let light: BlueprintImage
+    // URL of the logo for light appearance; artwork should be tightly cropped.
+    public let lightURL: URL
 
-    // Optional dark appearance logo artwork.
-    public let dark: BlueprintImage?
+    // Optional URL of the logo variant for dark appearance.
+    public let darkURL: URL?
+
+    // Width divided by height of the tightly cropped logo artwork.
+    public let aspectRatio: Double
+
+    // Optional optical wordmark baseline as a fraction from the top of the
+    // artwork (0...1). Leave unset for marks without a text baseline.
+    public let baseline: Double?
 
     // Where the label appears relative to the logo. The label should never
     // wrap.
@@ -2808,10 +2815,6 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
 
     // Space between the label and logo in points.
     public let gap: Double
-
-    // Optional optical wordmark baseline as a fraction from the top of the
-    // artwork (0...1). Leave unset for marks without a text baseline.
-    public let logoBaseline: Double?
     public private(set) var _backingData: Data?
 
     public init(
@@ -2822,15 +2825,16 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
          aboutUri: URL?,
          logo: BlueprintLogo,
          layout: BlueprintLayout,
-         light: BlueprintImage,
-         dark: BlueprintImage?,
+         lightURL: URL,
+         darkURL: URL?,
+         aspectRatio: Double,
+         baseline: Double?,
          labelPosition: BlueprintLabelPosition,
          labelAlignment: BlueprintLabelAlignment,
          verticalPlacement: BlueprintVerticalPlacement,
          logoHeight: Double,
          logoMaxWidth: Double?,
-         gap: Double,
-         logoBaseline: Double?
+         gap: Double
     ) {
         self.name = name
         self.label = label
@@ -2839,15 +2843,16 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
         self.aboutUri = aboutUri
         self.logo = logo
         self.layout = layout
-        self.light = light
-        self.dark = dark
+        self.lightURL = lightURL
+        self.darkURL = darkURL
+        self.aspectRatio = aspectRatio
+        self.baseline = baseline
         self.labelPosition = labelPosition
         self.labelAlignment = labelAlignment
         self.verticalPlacement = verticalPlacement
         self.logoHeight = logoHeight
         self.logoMaxWidth = logoMaxWidth
         self.gap = gap
-        self.logoBaseline = logoBaseline
     }
 
     public init?(data: Data) {
@@ -2883,15 +2888,21 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
         } else {
             return nil
         }
-        if let light = BlueprintImage(proto: proto.light) as BlueprintImage? {
-            self.light = light
+        if let lightURL = URL(string: proto.lightURL) {
+            self.lightURL = lightURL
         } else {
             return nil
         }
-        if proto.hasDark {
-            self.dark = BlueprintImage(proto: proto.dark)
+        if proto.hasDarkURL {
+            self.darkURL = URL(string: proto.darkURL)
         } else {
-            self.dark = nil
+            self.darkURL = nil
+        }
+        self.aspectRatio = proto.aspectRatio
+        if proto.hasBaseline {
+            self.baseline = proto.baseline
+        } else {
+            self.baseline = nil
         }
         if let labelPosition = BlueprintLabelPosition(proto: proto.labelPosition) as BlueprintLabelPosition? {
             self.labelPosition = labelPosition
@@ -2915,11 +2926,6 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
             self.logoMaxWidth = nil
         }
         self.gap = proto.gap
-        if proto.hasLogoBaseline {
-            self.logoBaseline = proto.logoBaseline
-        } else {
-            self.logoBaseline = nil
-        }
     }
 }
 
