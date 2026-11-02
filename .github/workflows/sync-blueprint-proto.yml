@@ -10,7 +10,13 @@ on:
   schedule:
     # Every day at 6am UTC.
     - cron: '0 6 * * *'
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Regenerate models even when blueprint.proto is unchanged
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -39,8 +45,13 @@ jobs:
 
       - name: Check for changes
         id: diff
+        env:
+          FORCE_REGENERATION: ${{ inputs.force || false }}
         run: |
-          if diff -q /tmp/blueprint.proto "${LOCAL_PROTO}" > /dev/null 2>&1; then
+          if [[ "${FORCE_REGENERATION}" == "true" ]]; then
+            echo "Forcing regeneration of Swift models"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif diff -q /tmp/blueprint.proto "${LOCAL_PROTO}" > /dev/null 2>&1; then
             echo "No changes to blueprint.proto"
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
