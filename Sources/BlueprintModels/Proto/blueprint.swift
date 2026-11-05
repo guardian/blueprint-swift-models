@@ -1556,6 +1556,88 @@ public struct BlueprintImage: Hashable, Equatable, Sendable {
     }
 }
 
+public struct BlueprintLayout: Hashable, Equatable, Sendable {
+
+    // Where the label appears relative to the logo. The label should never
+    // wrap.
+    // How the label is aligned with the logo.
+    // How the label and logo are positioned vertically in their slot.
+    public let labelPosition: BlueprintLabelPosition
+    public let labelAlignment: BlueprintLabelAlignment
+    public let verticalPlacement: BlueprintVerticalPlacement
+
+    // Target logo height in points.
+    public let logoHeight: Double
+
+    // Optional maximum logo width in points.
+    public let logoMaxWidth: Double?
+
+    // Space between the label and logo in points.
+    public let gap: Double
+
+    // Optional optical wordmark baseline as a fraction from the top of the
+    // artwork (0...1). Leave unset for marks without a text baseline.
+    public let logoBaseline: Double?
+    public private(set) var _backingData: Data?
+
+    public init(
+         labelPosition: BlueprintLabelPosition,
+         labelAlignment: BlueprintLabelAlignment,
+         verticalPlacement: BlueprintVerticalPlacement,
+         logoHeight: Double,
+         logoMaxWidth: Double?,
+         gap: Double,
+         logoBaseline: Double?
+    ) {
+        self.labelPosition = labelPosition
+        self.labelAlignment = labelAlignment
+        self.verticalPlacement = verticalPlacement
+        self.logoHeight = logoHeight
+        self.logoMaxWidth = logoMaxWidth
+        self.gap = gap
+        self.logoBaseline = logoBaseline
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoSponsor.Layout(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoSponsor.Layout) {
+        if let labelPosition = BlueprintLabelPosition(proto: proto.labelPosition) as BlueprintLabelPosition? {
+            self.labelPosition = labelPosition
+        } else {
+            return nil
+        }
+        if let labelAlignment = BlueprintLabelAlignment(proto: proto.labelAlignment) as BlueprintLabelAlignment? {
+            self.labelAlignment = labelAlignment
+        } else {
+            return nil
+        }
+        if let verticalPlacement = BlueprintVerticalPlacement(proto: proto.verticalPlacement) as BlueprintVerticalPlacement? {
+            self.verticalPlacement = verticalPlacement
+        } else {
+            return nil
+        }
+        self.logoHeight = proto.logoHeight
+        if proto.hasLogoMaxWidth {
+            self.logoMaxWidth = proto.logoMaxWidth
+        } else {
+            self.logoMaxWidth = nil
+        }
+        self.gap = proto.gap
+        if proto.hasLogoBaseline {
+            self.logoBaseline = proto.logoBaseline
+        } else {
+            self.logoBaseline = nil
+        }
+    }
+}
+
 public struct BlueprintLayoutAgnosticCollection: Hashable, Equatable, Sendable {
     public let id: String
 
@@ -1945,6 +2027,46 @@ public struct BlueprintLiveEvent: Hashable, Equatable, Sendable {
             self.lastUpdatedDate = proto.lastUpdatedDate.date
         } else {
             self.lastUpdatedDate = nil
+        }
+    }
+}
+
+public struct BlueprintLogo: Hashable, Equatable, Sendable {
+
+    // The light appearance logo artwork.
+    public let light: BlueprintImage
+
+    // Optional dark appearance logo artwork.
+    public let dark: BlueprintImage?
+    public private(set) var _backingData: Data?
+
+    public init(
+         light: BlueprintImage,
+         dark: BlueprintImage?
+    ) {
+        self.light = light
+        self.dark = dark
+    }
+
+    public init?(data: Data) {
+        if let proto = try? ProtoSponsor.Logo(serializedBytes: data) {
+            self.init(proto: proto)
+            self._backingData = data
+        } else {
+            return nil
+        }
+    }
+
+    internal init?(proto: ProtoSponsor.Logo) {
+        if let light = BlueprintImage(proto: proto.light) as BlueprintImage? {
+            self.light = light
+        } else {
+            return nil
+        }
+        if proto.hasDark {
+            self.dark = BlueprintImage(proto: proto.dark)
+        } else {
+            self.dark = nil
         }
     }
 }
@@ -2785,36 +2907,6 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
     public let aboutUri: URL?
     public let logo: BlueprintLogo
     public let layout: BlueprintLayout
-
-    // URL of the logo for light appearance; artwork should be tightly cropped.
-    public let lightURL: URL
-
-    // Optional URL of the logo variant for dark appearance.
-    public let darkURL: URL?
-
-    // Width divided by height of the tightly cropped logo artwork.
-    public let aspectRatio: Double
-
-    // Optional optical wordmark baseline as a fraction from the top of the
-    // artwork (0...1). Leave unset for marks without a text baseline.
-    public let baseline: Double?
-
-    // Where the label appears relative to the logo. The label should never
-    // wrap.
-    // How the label is aligned with the logo.
-    // How the label and logo are positioned vertically in their slot.
-    public let labelPosition: BlueprintLabelPosition
-    public let labelAlignment: BlueprintLabelAlignment
-    public let verticalPlacement: BlueprintVerticalPlacement
-
-    // Target logo height in points.
-    public let logoHeight: Double
-
-    // Optional maximum logo width in points.
-    public let logoMaxWidth: Double?
-
-    // Space between the label and logo in points.
-    public let gap: Double
     public private(set) var _backingData: Data?
 
     public init(
@@ -2824,17 +2916,7 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
          sponsorUri: URL,
          aboutUri: URL?,
          logo: BlueprintLogo,
-         layout: BlueprintLayout,
-         lightURL: URL,
-         darkURL: URL?,
-         aspectRatio: Double,
-         baseline: Double?,
-         labelPosition: BlueprintLabelPosition,
-         labelAlignment: BlueprintLabelAlignment,
-         verticalPlacement: BlueprintVerticalPlacement,
-         logoHeight: Double,
-         logoMaxWidth: Double?,
-         gap: Double
+         layout: BlueprintLayout
     ) {
         self.name = name
         self.label = label
@@ -2843,16 +2925,6 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
         self.aboutUri = aboutUri
         self.logo = logo
         self.layout = layout
-        self.lightURL = lightURL
-        self.darkURL = darkURL
-        self.aspectRatio = aspectRatio
-        self.baseline = baseline
-        self.labelPosition = labelPosition
-        self.labelAlignment = labelAlignment
-        self.verticalPlacement = verticalPlacement
-        self.logoHeight = logoHeight
-        self.logoMaxWidth = logoMaxWidth
-        self.gap = gap
     }
 
     public init?(data: Data) {
@@ -2888,44 +2960,6 @@ public struct BlueprintSponsor: Hashable, Equatable, Sendable {
         } else {
             return nil
         }
-        if let lightURL = URL(string: proto.lightURL) {
-            self.lightURL = lightURL
-        } else {
-            return nil
-        }
-        if proto.hasDarkURL {
-            self.darkURL = URL(string: proto.darkURL)
-        } else {
-            self.darkURL = nil
-        }
-        self.aspectRatio = proto.aspectRatio
-        if proto.hasBaseline {
-            self.baseline = proto.baseline
-        } else {
-            self.baseline = nil
-        }
-        if let labelPosition = BlueprintLabelPosition(proto: proto.labelPosition) as BlueprintLabelPosition? {
-            self.labelPosition = labelPosition
-        } else {
-            return nil
-        }
-        if let labelAlignment = BlueprintLabelAlignment(proto: proto.labelAlignment) as BlueprintLabelAlignment? {
-            self.labelAlignment = labelAlignment
-        } else {
-            return nil
-        }
-        if let verticalPlacement = BlueprintVerticalPlacement(proto: proto.verticalPlacement) as BlueprintVerticalPlacement? {
-            self.verticalPlacement = verticalPlacement
-        } else {
-            return nil
-        }
-        self.logoHeight = proto.logoHeight
-        if proto.hasLogoMaxWidth {
-            self.logoMaxWidth = proto.logoMaxWidth
-        } else {
-            self.logoMaxWidth = nil
-        }
-        self.gap = proto.gap
     }
 }
 
@@ -3728,14 +3762,14 @@ public enum BlueprintImageAspectRatio: Int, CaseIterable, Hashable, Equatable, S
     }
 }
 
-extension BlueprintSponsor {
+extension BlueprintLayout {
     public enum BlueprintLabelAlignment: Int, CaseIterable, Hashable, Equatable, Sendable {
         case unspecified = 0
         case center = 1
         case baseline = 2
         case unrecognized = 9999
 
-        internal init(proto: ProtoSponsor.LabelAlignment) {
+        internal init(proto: ProtoSponsor.Layout.LabelAlignment) {
             if let value = Self(rawValue: proto.rawValue) {
                 self = value
             } else {
@@ -3745,7 +3779,7 @@ extension BlueprintSponsor {
     }
 }
 
-extension BlueprintSponsor {
+extension BlueprintLayout {
     public enum BlueprintLabelPosition: Int, CaseIterable, Hashable, Equatable, Sendable {
         case unspecified = 0
         case leading = 1
@@ -3755,7 +3789,7 @@ extension BlueprintSponsor {
         case none = 5
         case unrecognized = 9999
 
-        internal init(proto: ProtoSponsor.LabelPosition) {
+        internal init(proto: ProtoSponsor.Layout.LabelPosition) {
             if let value = Self(rawValue: proto.rawValue) {
                 self = value
             } else {
@@ -3951,7 +3985,7 @@ public enum BlueprintTopBorderStyle: Int, CaseIterable, Hashable, Equatable, Sen
     }
 }
 
-extension BlueprintSponsor {
+extension BlueprintLayout {
     public enum BlueprintVerticalPlacement: Int, CaseIterable, Hashable, Equatable, Sendable {
         case unspecified = 0
         case top = 1
@@ -3961,7 +3995,7 @@ extension BlueprintSponsor {
         case logoBaseline = 5
         case unrecognized = 9999
 
-        internal init(proto: ProtoSponsor.VerticalPlacement) {
+        internal init(proto: ProtoSponsor.Layout.VerticalPlacement) {
             if let value = Self(rawValue: proto.rawValue) {
                 self = value
             } else {
