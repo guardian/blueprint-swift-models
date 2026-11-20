@@ -3011,9 +3011,38 @@ struct ProtoPuzzleArchiveLink: Sendable {
   /// collection.
   var puzzleTypes: [ProtoPuzzleTypes] = []
 
+  ///*
+  /// The color palette to use for the archive link in light mode.
+  /// We only use `background` and `main` for background and content, 
+  /// respectively.
+  var paletteLight: ProtoPalette {
+    get {return _paletteLight ?? ProtoPalette()}
+    set {_paletteLight = newValue}
+  }
+  /// Returns true if `paletteLight` has been explicitly set.
+  var hasPaletteLight: Bool {return self._paletteLight != nil}
+  /// Clears the value of `paletteLight`. Subsequent reads from it will return its default value.
+  mutating func clearPaletteLight() {self._paletteLight = nil}
+
+  ///*
+  /// The color palette to use for the archive link in dark mode.
+  /// We only use `background` and `main` for background and content, 
+  /// respectively.
+  var paletteDark: ProtoPalette {
+    get {return _paletteDark ?? ProtoPalette()}
+    set {_paletteDark = newValue}
+  }
+  /// Returns true if `paletteDark` has been explicitly set.
+  var hasPaletteDark: Bool {return self._paletteDark != nil}
+  /// Clears the value of `paletteDark`. Subsequent reads from it will return its default value.
+  mutating func clearPaletteDark() {self._paletteDark = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
+
+  fileprivate var _paletteLight: ProtoPalette? = nil
+  fileprivate var _paletteDark: ProtoPalette? = nil
 }
 
 ///*
@@ -7162,7 +7191,7 @@ extension ProtoMultimediaSlideshow: SwiftProtobuf.Message, SwiftProtobuf._Messag
 
 extension ProtoPuzzleArchiveLink: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".PuzzleArchiveLink"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}title\0\u{3}puzzle_types\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}title\0\u{3}puzzle_types\0\u{3}palette_light\0\u{3}palette_dark\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -7172,24 +7201,38 @@ extension ProtoPuzzleArchiveLink: SwiftProtobuf.Message, SwiftProtobuf._MessageI
       switch fieldNumber {
       case 1: try { try decoder.decodeSingularStringField(value: &self.title) }()
       case 2: try { try decoder.decodeRepeatedEnumField(value: &self.puzzleTypes) }()
+      case 3: try { try decoder.decodeSingularMessageField(value: &self._paletteLight) }()
+      case 4: try { try decoder.decodeSingularMessageField(value: &self._paletteDark) }()
       default: break
       }
     }
   }
 
   func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
     if !self.title.isEmpty {
       try visitor.visitSingularStringField(value: self.title, fieldNumber: 1)
     }
     if !self.puzzleTypes.isEmpty {
       try visitor.visitPackedEnumField(value: self.puzzleTypes, fieldNumber: 2)
     }
+    try { if let v = self._paletteLight {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._paletteDark {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
   static func ==(lhs: ProtoPuzzleArchiveLink, rhs: ProtoPuzzleArchiveLink) -> Bool {
     if lhs.title != rhs.title {return false}
     if lhs.puzzleTypes != rhs.puzzleTypes {return false}
+    if lhs._paletteLight != rhs._paletteLight {return false}
+    if lhs._paletteDark != rhs._paletteDark {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
