@@ -2704,14 +2704,28 @@ public struct BlueprintPuzzleArchiveLink: Hashable, Equatable, Sendable {
     // is used to display the puzzle types in the archive menu for this
     // collection.
     public let puzzleTypes: [BlueprintPuzzleTypes]
+
+    // The color palette to use for the archive link in light mode.
+    // We only use `background` and `main` for background and content,
+    // respectively.
+    public let paletteLight: BlueprintPalette?
+
+    // The color palette to use for the archive link in dark mode.
+    // We only use `background` and `main` for background and content,
+    // respectively.
+    public let paletteDark: BlueprintPalette?
     public private(set) var _backingData: Data?
 
     public init(
          title: String,
-         puzzleTypes: [BlueprintPuzzleTypes]
+         puzzleTypes: [BlueprintPuzzleTypes],
+         paletteLight: BlueprintPalette?,
+         paletteDark: BlueprintPalette?
     ) {
         self.title = title
         self.puzzleTypes = puzzleTypes
+        self.paletteLight = paletteLight
+        self.paletteDark = paletteDark
     }
 
     public init?(data: Data) {
@@ -2726,6 +2740,16 @@ public struct BlueprintPuzzleArchiveLink: Hashable, Equatable, Sendable {
     internal init?(proto: ProtoPuzzleArchiveLink) {
         self.title = proto.title
         self.puzzleTypes = proto.puzzleTypes.compactMap { BlueprintPuzzleTypes(proto: $0) }
+        if proto.hasPaletteLight {
+            self.paletteLight = BlueprintPalette(proto: proto.paletteLight)
+        } else {
+            self.paletteLight = nil
+        }
+        if proto.hasPaletteDark {
+            self.paletteDark = BlueprintPalette(proto: proto.paletteDark)
+        } else {
+            self.paletteDark = nil
+        }
     }
 }
 
